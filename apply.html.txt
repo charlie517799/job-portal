@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Apply Job</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body{font-family:Arial; margin:0; padding:0; background:#f4f4f4;}
+    header{background:#007bff; color:white; padding:15px; text-align:center;}
+    form{background:white; margin:20px; padding:15px; border-radius:8px; box-shadow:0 0 10px rgba(0,0,0,0.1);}
+    input, select{width:100%; padding:8px; margin:8px 0; border-radius:5px; border:1px solid #ccc;}
+    button{background:#28a745; color:white; border:none; padding:10px; cursor:pointer; border-radius:5px;}
+    button:hover{background:#218838;}
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>Apply for Job</h1>
+</header>
+
+<form id="jobForm">
+  <label>Full Name</label>
+  <input type="text" id="fullName" required>
+
+  <label>Aadhaar Number</label>
+  <input type="text" id="aadhaar" required>
+
+  <label>Date of Birth</label>
+  <input type="date" id="dob" required>
+
+  <label>Age</label>
+  <input type="number" id="age" required>
+
+  <label>Gender</label>
+  <select id="gender" required>
+    <option value="">Select</option>
+    <option>Male</option>
+    <option>Female</option>
+    <option>Other</option>
+  </select>
+
+  <label>Marital Status</label>
+  <select id="marital" required>
+    <option value="">Select</option>
+    <option>Married</option>
+    <option>Unmarried</option>
+  </select>
+
+  <label>Resume Upload</label>
+  <input type="file" id="resume" required>
+
+  <label>Photo Upload</label>
+  <input type="file" id="photo" required>
+
+  <button type="submit">Submit Application</button>
+</form>
+
+<script>
+document.getElementById('jobForm').addEventListener('submit', function(e){
+  e.preventDefault();
+  alert("Form submitted! (Next step: connect database)");
+});
+</script>
+
+</body>
+</html>

@@ -1,1 +1,37 @@
 <h1>Job Portal Working</h1>
+
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Job Portal</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body{font-family:Arial; margin:0; padding:0; background:#f4f4f4;}
+    header{background:#007bff; color:white; padding:15px; text-align:center;}
+    .job{background:white; margin:20px; padding:15px; border-radius:8px; box-shadow:0 0 10px rgba(0,0,0,0.1);}
+    button{background:#28a745; color:white; border:none; padding:8px 12px; cursor:pointer; border-radius:5px;}
+    button:hover{background:#218838;}
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>My Job Portal</h1>
+</header>
+
+<div class="job">
+  <h3>Computer Operator</h3>
+  <p>Location: Mumbai</p>
+  <p>Salary: 15,000 / month</p>
+  <a href="apply.html"><button>Apply Now</button></a>
+</div>
+
+<div class="job">
+  <h3>Office Assistant</h3>
+  <p>Location: Delhi</p>
+  <p>Salary: 12,000 / month</p>
+  <a href="apply.html"><button>Apply Now</button></a>
+</div>
+
+</body>
+</html>
