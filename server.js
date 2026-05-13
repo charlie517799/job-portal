@@ -33,7 +33,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/uploads', express.static(uploadsDir));
 
 // MySQL Connection
-const mysql = require("mysql2");
+
 
 const db = mysql.createConnection({
   host: process.env.DB_HOST,
