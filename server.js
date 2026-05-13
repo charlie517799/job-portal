@@ -303,13 +303,12 @@ text-align:center;
 ${row.photo ? `<img class="file-image" src="${row.photo}">` : 'Not uploaded'}
 
 <p><strong>Aadhaar:</strong></p>
-${row.aadhaar ? `<img class="file-image" src="/uploads/${row.aadhaar}">` : 'Not uploaded'}
+${row.aadhaar ? `<img class="file-image" src="${row.aadhaar}">` : 'Not uploaded'}
 
 <p><strong>PAN:</strong></p>
-${row.pan_card ? `<img class="file-image" src="/uploads/${row.pan_card}">` : 'Not uploaded'}
-
+${row.pan_card ? `<img class="file-image" src="${row.pan_card}">` : 'Not uploaded'}
 <p><strong>Resume:</strong></p>
-${row.resume ? `<a class="btn" href="/uploads/${row.resume}" target="_blank">View Resume</a>` : 'Not uploaded'}
+${row.resume ? `<a class="btn" href="${row.resume}" target="_blank">View Resume</a>` : 'Not uploaded'}
 </div>
 `;
     });
