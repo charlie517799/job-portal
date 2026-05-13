@@ -446,11 +446,23 @@ ${
 }
 
  9daac52c40d5e5f54309eee51ef2651174210561
+
+<a 
+href="/admin/delete-application/${row.id}" 
+class="btn"
+style="background:red;margin-top:15px;"
+onclick="return confirm('Delete this application?')"
+>
+Delete Application
+</a>
+
+
 </div>
 `;
     });
 
     html += `
+    
 </div>
 </body>
 </html>
@@ -461,7 +473,22 @@ ${
 });
 
 // ================= START SERVER =================
+app.get('/admin/delete-application/:id', isAdmin, (req, res) => {
+  const id = req.params.id;
 
+  db.query('DELETE FROM applications WHERE id = ?', [id], (err) => {
+    if (err) {
+      return res.send('Delete Failed');
+    }
+
+    res.send(`
+      <script>
+        alert('Application Deleted Successfully');
+        window.location.href='/admin/applications';
+      </script>
+    `);
+  });
+});
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
 });
