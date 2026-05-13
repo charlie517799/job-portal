@@ -3,13 +3,30 @@ require('dotenv').config();
 const express = require('express');
 const mysql = require('mysql2');
 const multer = require('multer');
+
+const cloudinary = require('cloudinary').v2;
+const { CloudinaryStorage } = require('multer-storage-cloudinary');
+
+
+
 const path = require('path');
 const bodyParser = require('body-parser');
 const session = require('express-session');
 const fs = require('fs');
 
 const app = express();
+
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
+
+
+
+
 const PORT = process.env.PORT || 3001;
+
 
 // Create uploads folder
 const uploadsDir = path.join(__dirname, 'uploads');
@@ -49,10 +66,11 @@ db.connect((err) => {
 });
 
 // File Upload
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, uploadsDir),
-  filename: (req, file, cb) => {
-    cb(null, Date.now() + '-' + file.originalname.replace(/\s+/g, '_'));
+const storage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: {
+    folder: 'job-portal',
+    allowed_formats: ['jpg', 'jpeg', 'png', 'pdf'],
   },
 });
 
@@ -146,11 +164,12 @@ app.post(
       current_address,
     } = req.body;
 
-    const photo = req.files?.photo?.[0]?.filename || null;
-    const aadhaar = req.files?.aadhaar?.[0]?.filename || null;
-    const pan_card = req.files?.pan_card?.[0]?.filename || null;
-    const resume = req.files?.resume?.[0]?.filename || null;
+    const photo = req.files?.photo?.[0]?.path || null;
+   const aadhaar = req.files?.aadhaar?.[0]?.path || null;
 
+const pan_card = req.files?.pan_card?.[0]?.path || null;
+
+const resume = req.files?.resume?.[0]?.path || null;
     db.query(
       `INSERT INTO applications 
       (job_id, full_name, mobile, age, dob, gender, marital_status,
@@ -281,7 +300,7 @@ text-align:center;
 <p><strong>Permanent Address:</strong> ${row.permanent_address}</p>
 
 <p><strong>Photo:</strong></p>
-${row.photo ? `<img class="file-image" src="/uploads/${row.photo}">` : 'Not uploaded'}
+${row.photo ? `<img class="file-image" src="${row.photo}">` : 'Not uploaded'}
 
 <p><strong>Aadhaar:</strong></p>
 ${row.aadhaar ? `<img class="file-image" src="/uploads/${row.aadhaar}">` : 'Not uploaded'}
