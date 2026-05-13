@@ -3,12 +3,8 @@ require('dotenv').config();
 const express = require('express');
 const mysql = require('mysql2');
 const multer = require('multer');
-
 const cloudinary = require('cloudinary').v2;
 const { CloudinaryStorage } = require('multer-storage-cloudinary');
-
-
-
 const path = require('path');
 const bodyParser = require('body-parser');
 const session = require('express-session');
@@ -22,20 +18,18 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-
-
-
 const PORT = process.env.PORT || 3001;
 
+// ================= CREATE UPLOADS FOLDER =================
 
-// Create uploads folder
 const uploadsDir = path.join(__dirname, 'uploads');
 
 if (!fs.existsSync(uploadsDir)) {
   fs.mkdirSync(uploadsDir);
 }
 
-// Middleware
+// ================= MIDDLEWARE =================
+
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
@@ -69,7 +63,7 @@ db.connect((err) => {
   } else {
     console.log('MySQL Connected Successfully');
 
-    // Create jobs table
+    // JOBS TABLE
     const jobsTable = `
       CREATE TABLE IF NOT EXISTS jobs (
         id INT AUTO_INCREMENT PRIMARY KEY,
@@ -81,15 +75,9 @@ db.connect((err) => {
       )
     `;
 
-    db.query(jobsTable, (err) => {
-      if (err) {
-        console.log('Jobs table error:', err);
-      } else {
-        console.log('Jobs table ready');
-      }
-    });
+    db.query(jobsTable);
 
-    // Create applications table
+    // APPLICATIONS TABLE
     const applicationsTable = `
       CREATE TABLE IF NOT EXISTS applications (
         id INT AUTO_INCREMENT PRIMARY KEY,
@@ -102,40 +90,25 @@ db.connect((err) => {
         marital_status VARCHAR(50),
         permanent_address TEXT,
         current_address TEXT,
-        photo VARCHAR(255),
-        aadhaar VARCHAR(255),
-        pan_card VARCHAR(255),
-        resume VARCHAR(255),
+        photo TEXT,
+        aadhaar TEXT,
+        pan_card TEXT,
+        resume TEXT,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       )
     `;
 
-    db.query(applicationsTable, (err) => {
-      if (err) {
-        console.log('Applications table error:', err);
-      } else {
-        console.log('Applications table ready');
-      }
-    });
+    db.query(applicationsTable);
   }
 });
 
- HEAD
-// File Upload
+// ================= CLOUDINARY STORAGE =================
+
 const storage = new CloudinaryStorage({
   cloudinary: cloudinary,
   params: {
     folder: 'job-portal',
     allowed_formats: ['jpg', 'jpeg', 'png', 'pdf'],
-
-// ================= FILE UPLOAD =================
-
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, uploadsDir),
-
-  filename: (req, file, cb) => {
-    cb(null, Date.now() + '-' + file.originalname.replace(/\s+/g, '_'));
- 9daac52c40d5e5f54309eee51ef2651174210561
   },
 });
 
@@ -144,7 +117,9 @@ const upload = multer({ storage });
 // ================= ADMIN MIDDLEWARE =================
 
 function isAdmin(req, res, next) {
-  if (req.session.admin) return next();
+  if (req.session.admin) {
+    return next();
+  }
 
   res.redirect('/admin-login.html');
 }
@@ -246,11 +221,10 @@ app.post(
     } = req.body;
 
     const photo = req.files?.photo?.[0]?.path || null;
-   const aadhaar = req.files?.aadhaar?.[0]?.path || null;
+    const aadhaar = req.files?.aadhaar?.[0]?.path || null;
+    const pan_card = req.files?.pan_card?.[0]?.path || null;
+    const resume = req.files?.resume?.[0]?.path || null;
 
-const pan_card = req.files?.pan_card?.[0]?.path || null;
-
-const resume = req.files?.resume?.[0]?.path || null;
     db.query(
       `INSERT INTO applications
       (job_id, full_name, mobile, age, dob, gender, marital_status,
@@ -346,6 +320,7 @@ box-shadow:0 10px 30px rgba(0,0,0,0.15);
 width:100%;
 max-width:250px;
 border-radius:12px;
+margin-bottom:10px;
 }
 
 .btn{
@@ -355,6 +330,7 @@ background:#2563eb;
 color:white;
 text-decoration:none;
 border-radius:10px;
+margin-top:10px;
 }
 
 .empty{
@@ -392,77 +368,37 @@ text-align:center;
 <p><strong>Age:</strong> ${row.age}</p>
 <p><strong>Gender:</strong> ${row.gender}</p>
 <p><strong>Marital Status:</strong> ${row.marital_status}</p>
-
 <p><strong>Current Address:</strong> ${row.current_address}</p>
-
 <p><strong>Permanent Address:</strong> ${row.permanent_address}</p>
 
 <p><strong>Photo:</strong></p>
- HEAD
 ${row.photo ? `<img class="file-image" src="${row.photo}">` : 'Not uploaded'}
 
 <p><strong>Aadhaar:</strong></p>
 ${row.aadhaar ? `<img class="file-image" src="${row.aadhaar}">` : 'Not uploaded'}
 
-
-${
-  row.photo
-    ? `<img class="file-image" src="/uploads/${row.photo}">`
-    : 'Not uploaded'
 <p><strong>PAN:</strong></p>
 ${row.pan_card ? `<img class="file-image" src="${row.pan_card}">` : 'Not uploaded'}
+
 <p><strong>Resume:</strong></p>
 ${row.resume ? `<a class="btn" href="${row.resume}" target="_blank">View Resume</a>` : 'Not uploaded'}
 
-
-${
-  row.photo
-    ? `<img class="file-image" src="/uploads/${row.photo}">`
-    : 'Not uploaded'
-}
-
-<p><strong>Aadhaar:</strong></p>
-
-${
-  row.aadhaar
-    ? `<img class="file-image" src="/uploads/${row.aadhaar}">`
-    : 'Not uploaded'
-}
-
-<p><strong>PAN:</strong></p>
-
-${
-  row.pan_card
-    ? `<img class="file-image" src="/uploads/${row.pan_card}">`
-    : 'Not uploaded'
-}
-
-<p><strong>Resume:</strong></p>
-
-${
-  row.resume
-    ? `<a class="btn" href="/uploads/${row.resume}" target="_blank">View Resume</a>`
-    : 'Not uploaded'
-}
-
- 9daac52c40d5e5f54309eee51ef2651174210561
+<br><br>
 
 <a 
 href="/admin/delete-application/${row.id}" 
 class="btn"
-style="background:red;margin-top:15px;"
+style="background:red;"
 onclick="return confirm('Delete this application?')"
 >
 Delete Application
 </a>
-
 
 </div>
 `;
     });
 
     html += `
-    
 </div>
 </body>
 </html>
@@ -472,7 +408,8 @@ Delete Application
   });
 });
 
-// ================= START SERVER =================
+// ================= DELETE APPLICATION =================
+
 app.get('/admin/delete-application/:id', isAdmin, (req, res) => {
   const id = req.params.id;
 
@@ -489,6 +426,9 @@ app.get('/admin/delete-application/:id', isAdmin, (req, res) => {
     `);
   });
 });
+
+// ================= START SERVER =================
+
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
 });
