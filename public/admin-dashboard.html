@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Dashboard</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="container">
+
+<h1>⚡ Admin Dashboard</h1>
+
+<h2>Post New Job</h2>
+
+<form action="/admin/add-job" method="POST">
+<input type="text" name="title" placeholder="Job Title" required>
+
+<select name="company" required>
+<option value="">Select Category</option>
+<option>Government</option>
+<option>Corporate</option>
+</select>
+
+<input type="text" name="location" placeholder="Location">
+
+<textarea name="description" placeholder="Job Description"></textarea>
+
+<button type="submit">Post Job</button>
+</form>
+
+<br>
+
+<a href="/admin/applications">
+<button>📋 View Applications</button>
+</a>
+
+<br><br>
+
+<a href="/admin/logout">
+<button>🚪 Logout</button>
+</a>
+
+</div>
+
+</body>
+</html>
