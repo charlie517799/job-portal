@@ -364,6 +364,9 @@ text-align:center;
 <p><strong>Mobile:</strong> ${row.mobile}</p>
 <p><strong>Age:</strong> ${row.age}</p>
 <p><strong>Gender:</strong> ${row.gender}</p>
+<p><strong>Marital Status:</strong> ${row.marital_status}</p>
+
+<p><strong>Current Address:</strong> ${row.current_address}</p>
 
 <p><strong>Permanent Address:</strong> ${row.permanent_address}</p>
 
