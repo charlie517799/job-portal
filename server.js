@@ -12,15 +12,17 @@ const fs = require('fs');
 
 const app = express();
 
+const PORT = process.env.PORT || 3001;
+
+// ================= CLOUDINARY =================
+
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
   api_key: process.env.CLOUDINARY_API_KEY,
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-const PORT = process.env.PORT || 3001;
-
-// ================= CREATE UPLOADS FOLDER =================
+// ================= UPLOADS FOLDER =================
 
 const uploadsDir = path.join(__dirname, 'uploads');
 
@@ -63,7 +65,8 @@ db.connect((err) => {
   } else {
     console.log('MySQL Connected Successfully');
 
-    // JOBS TABLE
+    // ================= JOBS TABLE =================
+
     const jobsTable = `
       CREATE TABLE IF NOT EXISTS jobs (
         id INT AUTO_INCREMENT PRIMARY KEY,
@@ -77,7 +80,8 @@ db.connect((err) => {
 
     db.query(jobsTable);
 
-    // APPLICATIONS TABLE
+    // ================= APPLICATIONS TABLE =================
+
     const applicationsTable = `
       CREATE TABLE IF NOT EXISTS applications (
         id INT AUTO_INCREMENT PRIMARY KEY,
@@ -152,7 +156,7 @@ app.post('/admin/login', (req, res) => {
   `);
 });
 
-// ================= LOGOUT =================
+// ================= ADMIN LOGOUT =================
 
 app.get('/admin/logout', (req, res) => {
   req.session.destroy(() => {
@@ -195,6 +199,30 @@ app.get('/api/jobs', (req, res) => {
   });
 });
 
+// ================= DELETE JOB =================
+
+app.get('/admin/delete-job/:id', isAdmin, (req, res) => {
+  const id = req.params.id;
+
+  db.query('DELETE FROM jobs WHERE id = ?', [id], (err) => {
+    if (err) {
+      return res.send(`
+        <script>
+          alert('Delete Failed');
+          window.location.href='/admin-dashboard.html';
+        </script>
+      `);
+    }
+
+    res.send(`
+      <script>
+        alert('Job Deleted Successfully');
+        window.location.href='/admin-dashboard.html';
+      </script>
+    `);
+  });
+});
+
 // ================= APPLY JOB =================
 
 app.post(
@@ -227,10 +255,22 @@ app.post(
 
     db.query(
       `INSERT INTO applications
-      (job_id, full_name, mobile, age, dob, gender, marital_status,
-      permanent_address, current_address, photo, aadhaar, pan_card, resume)
+      (
+        job_id,
+        full_name,
+        mobile,
+        age,
+        dob,
+        gender,
+        marital_status,
+        permanent_address,
+        current_address,
+        photo,
+        aadhaar,
+        pan_card,
+        resume
+      )
       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-
       [
         job_id,
         full_name,
@@ -246,7 +286,6 @@ app.post(
         pan_card,
         resume,
       ],
-
       (err) => {
         if (err) {
           return res.send(err.message);
@@ -385,8 +424,8 @@ ${row.resume ? `<a class="btn" href="${row.resume}" target="_blank">View Resume<
 
 <br><br>
 
-<a 
-href="/admin/delete-application/${row.id}" 
+<a
+href="/admin/delete-application/${row.id}"
 class="btn"
 style="background:red;"
 onclick="return confirm('Delete this application?')"
