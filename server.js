@@ -167,10 +167,57 @@ app.get('/admin/logout', (req, res) => {
 // ================= ADD JOB =================
 
 app.post('/admin/add-job', isAdmin, (req, res) => {
-  const { title, company, location, description } = req.body;
+  const {
+title,
+company,
+location,
+description,
+job_type,
+min_age,
+max_age,
+apply_start_date,
+apply_end_date,
+total_posts,
+qualification,
+general_posts,
+obc_posts,
+sc_posts,
+st_posts,
+ews_posts,
+male_posts,
+female_posts,
+other_posts,
+physical_details,
+application_fee,
+selection_process
+} = req.body;
 
   db.query(
-    'INSERT INTO jobs (title, company, location, description) VALUES (?, ?, ?, ?)',
+    'INSERT INTO jobs (
+[
+title,
+company,
+location,
+description,
+job_type,
+min_age,
+max_age,
+apply_start_date,
+apply_end_date,
+total_posts,
+qualification,
+general_posts,
+obc_posts,
+sc_posts,
+st_posts,
+ews_posts,
+male_posts,
+female_posts,
+other_posts,
+physical_details,
+application_fee,
+selection_process
+]',
     [title, company, location, description],
     (err) => {
       if (err) {
