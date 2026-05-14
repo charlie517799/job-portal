@@ -77,40 +77,10 @@ db.getConnection((err, connection) => {
     const jobsTable = `
       CREATE TABLE IF NOT EXISTS jobs (
         id INT AUTO_INCREMENT PRIMARY KEY,
-
         title VARCHAR(255),
         company VARCHAR(255),
         location VARCHAR(255),
         description TEXT,
-
-        job_type VARCHAR(50) DEFAULT 'corporate',
-
-        min_age VARCHAR(50),
-        max_age VARCHAR(50),
-
-        apply_start_date VARCHAR(100),
-        apply_end_date VARCHAR(100),
-
-        total_posts VARCHAR(100),
-
-        qualification TEXT,
-
-        general_posts VARCHAR(50),
-        obc_posts VARCHAR(50),
-        sc_posts VARCHAR(50),
-        st_posts VARCHAR(50),
-        ews_posts VARCHAR(50),
-
-        male_posts VARCHAR(50),
-        female_posts VARCHAR(50),
-        other_posts VARCHAR(50),
-
-        physical_details TEXT,
-
-        application_fee VARCHAR(100),
-
-        selection_process TEXT,
-
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       )
     `;
@@ -160,11 +130,13 @@ const upload = multer({ storage });
 // ================= ADMIN MIDDLEWARE =================
 
 function isAdmin(req, res, next) {
+
   if (req.session.admin) {
     return next();
   }
 
   res.redirect('/admin-login.html');
+
 }
 
 // ================= HOME =================
@@ -217,103 +189,38 @@ app.post('/admin/add-job', isAdmin, (req, res) => {
     title,
     company,
     location,
-    description,
-    job_type,
-    min_age,
-    max_age,
-    apply_start_date,
-    apply_end_date,
-    total_posts,
-    qualification,
-    general_posts,
-    obc_posts,
-    sc_posts,
-    st_posts,
-    ews_posts,
-    male_posts,
-    female_posts,
-    other_posts,
-    physical_details,
-    application_fee,
-    selection_process
+    description
   } = req.body;
 
-  const sql = `
-    INSERT INTO jobs (
-      title,
-      company,
-      location,
-      description,
-      job_type,
-      min_age,
-      max_age,
-      apply_start_date,
-      apply_end_date,
-      total_posts,
-      qualification,
-      general_posts,
-      obc_posts,
-      sc_posts,
-      st_posts,
-      ews_posts,
-      male_posts,
-      female_posts,
-      other_posts,
-      physical_details,
-      application_fee,
-      selection_process
-    )
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-  `;
+  db.query(
+    'INSERT INTO jobs (title, company, location, description) VALUES (?, ?, ?, ?)',
+    [title, company, location, description],
 
-  const values = [
-    title,
-    company,
-    location,
-    description,
-    job_type,
-    min_age,
-    max_age,
-    apply_start_date,
-    apply_end_date,
-    total_posts,
-    qualification,
-    general_posts,
-    obc_posts,
-    sc_posts,
-    st_posts,
-    ews_posts,
-    male_posts,
-    female_posts,
-    other_posts,
-    physical_details,
-    application_fee,
-    selection_process
-  ];
+    (err) => {
 
-  db.query(sql, values, (err) => {
+      if (err) {
 
-    if (err) {
+        console.log(err);
 
-      console.log(err);
+        return res.send(`
+          <script>
+            alert('Error Posting Job');
+            window.location.href='/admin-dashboard.html';
+          </script>
+        `);
 
-      return res.send(`
+      }
+
+      res.send(`
         <script>
-          alert('Error Posting Job');
+          alert('Job Posted Successfully!');
           window.location.href='/admin-dashboard.html';
         </script>
       `);
 
     }
 
-    res.send(`
-      <script>
-        alert('Job Posted Successfully!');
-        window.location.href='/admin-dashboard.html';
-      </script>
-    `);
-
-  });
+  );
 
 });
 
@@ -448,6 +355,137 @@ app.post(
   }
 
 );
+
+// ================= VIEW APPLICATIONS =================
+
+app.get('/admin/applications', isAdmin, (req, res) => {
+
+  const sql = `
+    SELECT applications.*, jobs.title AS job_title
+    FROM applications
+    LEFT JOIN jobs ON applications.job_id = jobs.id
+    ORDER BY applications.id DESC
+  `;
+
+  db.query(sql, (err, results) => {
+
+    if (err) {
+      return res.send('Error fetching applications');
+    }
+
+    let html = `
+<!DOCTYPE html>
+<html>
+<head>
+<title>Applications</title>
+
+<style>
+
+body{
+margin:0;
+padding:20px;
+font-family:Segoe UI;
+background:linear-gradient(135deg,#2563eb,#0f172a);
+}
+
+.application-card{
+background:white;
+padding:25px;
+border-radius:20px;
+margin-bottom:20px;
+}
+
+.file-image{
+width:200px;
+border-radius:10px;
+}
+
+.btn{
+display:inline-block;
+padding:10px 15px;
+background:#2563eb;
+color:white;
+text-decoration:none;
+border-radius:8px;
+margin-top:10px;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<h1 style="color:white;">Applications</h1>
+<a href="/admin-dashboard.html" style="color:white;">Back</a>
+
+`;
+
+    results.forEach((row) => {
+
+      html += `
+
+<div class="application-card">
+
+<h2>${row.full_name}</h2>
+
+<p><strong>Job:</strong> ${row.job_title || ''}</p>
+<p><strong>Mobile:</strong> ${row.mobile}</p>
+<p><strong>Age:</strong> ${row.age}</p>
+<p><strong>Gender:</strong> ${row.gender}</p>
+
+<p><strong>Photo:</strong></p>
+${row.photo ? `<img class="file-image" src="${row.photo}">` : 'Not uploaded'}
+
+<br><br>
+
+<a
+href="/admin/delete-application/${row.id}"
+class="btn"
+style="background:red;"
+>
+Delete Application
+</a>
+
+</div>
+
+`;
+
+    });
+
+    html += `
+</body>
+</html>
+`;
+
+    res.send(html);
+
+  });
+
+});
+
+// ================= DELETE APPLICATION =================
+
+app.get('/admin/delete-application/:id', isAdmin, (req, res) => {
+
+  const id = req.params.id;
+
+  db.query('DELETE FROM applications WHERE id = ?', [id], (err) => {
+
+    if (err) {
+      return res.send('Delete Failed');
+    }
+
+    res.send(`
+      <script>
+        alert('Application Deleted Successfully');
+        window.location.href='/admin/applications';
+      </script>
+    `);
+
+  });
+
+});
 
 // ================= START SERVER =================
 
