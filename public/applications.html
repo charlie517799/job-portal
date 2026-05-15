@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Applications</title>
+
+<style>
+body {
+  font-family: Arial, sans-serif;
+  background: #f3f4f6;
+  margin: 0;
+  padding: 20px;
+}
+
+.container {
+  max-width: 1400px;
+  margin: auto;
+  background: #fff;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+}
+
+h1 {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th, td {
+  border: 1px solid #ddd;
+  padding: 10px;
+  text-align: left;
+}
+
+th {
+  background: #2563eb;
+  color: white;
+}
+
+img {
+  width: 80px;
+  border-radius: 8px;
+}
+
+a {
+  color: #2563eb;
+  text-decoration: none;
+}
+
+.table-wrapper {
+  overflow-x: auto;
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+  <h1>Job Applications</h1>
+  <div class="table-wrapper">
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Job Title</th>
+          <th>Name</th>
+          <th>Mobile</th>
+          <th>Photo</th>
+          <th>Aadhaar</th>
+          <th>PAN</th>
+          <th>Resume</th>
+        </tr>
+      </thead>
+      <tbody id="tbody"></tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+async function loadApplications() {
+  const res = await fetch('/api/applications');
+  const data = await res.json();
+
+  const tbody = document.getElementById('tbody');
+
+  data.forEach(app => {
+    tbody.innerHTML += `
+      <tr>
+        <td>${app.id}</td>
+        <td>${app.job_title || 'N/A'}</td>
+        <td>${app.full_name}</td>
+        <td>${app.mobile}</td>
+        <td><img src="${app.photo}" alt="Photo"></td>
+        <td><a href="${app.aadhaar}" target="_blank">View</a></td>
+        <td><a href="${app.pan_card}" target="_blank">View</a></td>
+        <td><a href="${app.resume}" target="_blank">View</a></td>
+      </tr>
+    `;
+  });
+}
+
+loadApplications();
+</script>
+
+</body>
+</html>
