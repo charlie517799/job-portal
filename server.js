@@ -60,9 +60,11 @@ const db = mysql.createConnection({
 });
 
 db.connect((err) => {
+
   if (err) {
     console.log('Database connection failed:', err);
   } else {
+
     console.log('MySQL Connected Successfully');
 
     // ================= JOBS TABLE =================
@@ -103,19 +105,18 @@ db.connect((err) => {
     `;
 
     db.query(applicationsTable);
+
   }
+
 });
 
 // ================= CLOUDINARY STORAGE =================
 
 const storage = new CloudinaryStorage({
   cloudinary: cloudinary,
-  params: async (req, file) => {
-    return {
-      folder: 'job-portal',
-      resource_type: 'auto',
-      allowed_formats: ['jpg', 'jpeg', 'png', 'pdf'],
-    };
+  params: {
+    folder: 'job-portal',
+    resource_type: 'auto',
   },
 });
 
@@ -129,11 +130,13 @@ const upload = multer({
 // ================= ADMIN MIDDLEWARE =================
 
 function isAdmin(req, res, next) {
+
   if (req.session.admin) {
     return next();
   }
 
   res.redirect('/admin-login.html');
+
 }
 
 // ================= HOME =================
@@ -145,15 +148,18 @@ app.get('/', (req, res) => {
 // ================= ADMIN LOGIN =================
 
 app.post('/admin/login', (req, res) => {
+
   const { username, password } = req.body;
 
   if (
     username === (process.env.ADMIN_USERNAME || 'admin') &&
     password === (process.env.ADMIN_PASSWORD || '251122')
   ) {
+
     req.session.admin = true;
 
     return res.redirect('/admin-dashboard.html');
+
   }
 
   res.send(`
@@ -162,14 +168,17 @@ app.post('/admin/login', (req, res) => {
       window.location.href='/admin-login.html';
     </script>
   `);
+
 });
 
 // ================= ADMIN LOGOUT =================
 
 app.get('/admin/logout', (req, res) => {
+
   req.session.destroy(() => {
     res.redirect('/admin-login.html');
   });
+
 });
 
 // ================= ADD JOB =================
