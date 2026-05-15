@@ -1,8 +1,3 @@
-# Working `server.js`
-
-Is poore code ko copy karke apne existing `server.js` ko replace kar do.
-
-```javascript
 require('dotenv').config();
 
 const express = require('express');
@@ -29,6 +24,7 @@ cloudinary.config({
 // ================= UPLOADS FOLDER =================
 
 const uploadsDir = path.join(__dirname, 'uploads');
+
 if (!fs.existsSync(uploadsDir)) {
   fs.mkdirSync(uploadsDir);
 }
@@ -70,6 +66,7 @@ db.connect((err) => {
 
   console.log('MySQL Connected Successfully');
 
+  // Jobs Table
   db.query(`
     CREATE TABLE IF NOT EXISTS jobs (
       id INT AUTO_INCREMENT PRIMARY KEY,
@@ -81,6 +78,7 @@ db.connect((err) => {
     )
   `);
 
+  // Applications Table
   db.query(`
     CREATE TABLE IF NOT EXISTS applications (
       id INT AUTO_INCREMENT PRIMARY KEY,
@@ -115,7 +113,7 @@ const storage = new CloudinaryStorage({
 const upload = multer({
   storage,
   limits: {
-    fileSize: 5 * 1024 * 1024,
+    fileSize: 5 * 1024 * 1024, // 5MB
   },
 });
 
@@ -169,22 +167,23 @@ app.get('/admin/logout', (req, res) => {
 app.post('/admin/add-job', isAdmin, (req, res) => {
   const { title, company, location, description } = req.body;
 
-  db.query(
-    `INSERT INTO jobs (title, company, location, description) VALUES (?, ?, ?, ?)`,
-    [title, company, location, description],
-    (err) => {
-      if (err) {
-        return res.send(err.message);
-      }
+  const sql = `
+    INSERT INTO jobs (title, company, location, description)
+    VALUES (?, ?, ?, ?)
+  `;
 
-      res.send(`
-        <script>
-          alert('Job Posted Successfully!');
-          window.location.href='/admin-dashboard.html';
-        </script>
-      `);
+  db.query(sql, [title, company, location, description], (err) => {
+    if (err) {
+      return res.send(err.message);
     }
-  );
+
+    res.send(`
+      <script>
+        alert('Job Posted Successfully!');
+        window.location.href='/admin-dashboard.html';
+      </script>
+    `);
+  });
 });
 
 // ================= GET JOBS =================
@@ -236,7 +235,10 @@ app.post(
     ])(req, res, function (err) {
       if (err) {
         console.log('UPLOAD ERROR:', err);
-        return res.send(`<h2>Upload Error</h2><p>${err.message}</p>`);
+        return res.send(`
+          <h2>Upload Error</h2>
+          <p>${err.message}</p>
+        `);
       }
 
       next();
@@ -261,8 +263,7 @@ app.post(
       const pan_card = req.files?.pan_card?.[0]?.path || '';
       const resume = req.files?.resume?.[0]?.path || '';
 
-      db.query(
-        `
+      const sql = `
         INSERT INTO applications (
           job_id,
           full_name,
@@ -279,7 +280,10 @@ app.post(
           resume
         )
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        `,
+      `;
+
+      db.query(
+        sql,
         [
           job_id,
           full_name,
@@ -298,7 +302,10 @@ app.post(
         (err) => {
           if (err) {
             console.log('MYSQL ERROR:', err);
-            return res.send(`<h2>Database Error</h2><p>${err.message}</p>`);
+            return res.send(`
+              <h2>Database Error</h2>
+              <p>${err.message}</p>
+            `);
           }
 
           res.send(`
@@ -311,18 +318,24 @@ app.post(
       );
     } catch (error) {
       console.log('SERVER ERROR:', error);
-      res.send(`<h2>Server Error</h2><p>${error.message}</p>`);
+
+      res.send(`
+        <h2>Server Error</h2>
+        <p>${error.message}</p>
+      `);
     }
   }
 );
 
 // ================= ADMIN APPLICATIONS PAGE =================
+// IMPORTANT: Ye route HTML page open karega
 
 app.get('/admin/applications', isAdmin, (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'applications.html'));
 });
 
 // ================= APPLICATIONS API =================
+// JSON sirf is route par milega
 
 app.get('/api/applications', isAdmin, (req, res) => {
   const sql = `
@@ -371,15 +384,3 @@ app.get('/admin/delete-application/:id', isAdmin, (req, res) => {
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
 });
-```
-
-## Iske Baad
-
-1. File save karo.
-2. GitHub par push karo.
-3. Render automatically redeploy karega.
-4. Open karo:
-
-   * [https://job-portal-mdfk.onrender.com/admin/applications](https://job-portal-mdfk.onrender.com/admin/applications)
-
-Ab raw JSON ki jagah proper table view dikhega (agar `public/applications.html` file project me maujood hai).
