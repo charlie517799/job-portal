@@ -48,29 +48,22 @@ app.use('/uploads', express.static(uploadsDir));
 
 // ================= MYSQL CONNECTION =================
 
-const db = mysql.createPool({
-  connectionLimit: 10,
+const db = mysql.createConnection({
   host: process.env.DB_HOST,
   user: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
   database: process.env.DB_NAME,
   port: process.env.DB_PORT,
-  waitForConnections: true,
-  queueLimit: 0,
   ssl: {
     rejectUnauthorized: false,
   },
 });
 
-db.getConnection((err, connection) => {
-
+db.connect((err) => {
   if (err) {
     console.log('Database connection failed:', err);
   } else {
-
     console.log('MySQL Connected Successfully');
-
-    connection.release();
 
     // ================= JOBS TABLE =================
 
@@ -110,9 +103,7 @@ db.getConnection((err, connection) => {
     `;
 
     db.query(applicationsTable);
-
   }
-
 });
 
 // ================= CLOUDINARY STORAGE =================
@@ -130,13 +121,11 @@ const upload = multer({ storage });
 // ================= ADMIN MIDDLEWARE =================
 
 function isAdmin(req, res, next) {
-
   if (req.session.admin) {
     return next();
   }
 
   res.redirect('/admin-login.html');
-
 }
 
 // ================= HOME =================
@@ -148,18 +137,15 @@ app.get('/', (req, res) => {
 // ================= ADMIN LOGIN =================
 
 app.post('/admin/login', (req, res) => {
-
   const { username, password } = req.body;
 
   if (
     username === (process.env.ADMIN_USERNAME || 'admin') &&
     password === (process.env.ADMIN_PASSWORD || '251122')
   ) {
-
     req.session.admin = true;
 
     return res.redirect('/admin-dashboard.html');
-
   }
 
   res.send(`
@@ -168,47 +154,30 @@ app.post('/admin/login', (req, res) => {
       window.location.href='/admin-login.html';
     </script>
   `);
-
 });
 
 // ================= ADMIN LOGOUT =================
 
 app.get('/admin/logout', (req, res) => {
-
   req.session.destroy(() => {
     res.redirect('/admin-login.html');
   });
-
 });
 
 // ================= ADD JOB =================
 
 app.post('/admin/add-job', isAdmin, (req, res) => {
 
-  const {
-    title,
-    company,
-    location,
-    description
-  } = req.body;
-
-  db.query(
-    'INSERT INTO jobs (title, company, location, description) VALUES (?, ?, ?, ?)',
+ const sql = `
+INSERT INTO jobs (title, company, location, description)
+VALUES (?, ?, ?, ?)
+`;',
     [title, company, location, description],
 
     (err) => {
 
       if (err) {
-
-        console.log(err);
-
-        return res.send(`
-          <script>
-            alert('Error Posting Job');
-            window.location.href='/admin-dashboard.html';
-          </script>
-        `);
-
+        return res.send(err.message);
       }
 
       res.send(`
@@ -219,7 +188,6 @@ app.post('/admin/add-job', isAdmin, (req, res) => {
       `);
 
     }
-
   );
 
 });
@@ -227,36 +195,28 @@ app.post('/admin/add-job', isAdmin, (req, res) => {
 // ================= GET JOBS =================
 
 app.get('/api/jobs', (req, res) => {
-
   db.query('SELECT * FROM jobs ORDER BY id DESC', (err, results) => {
-
     if (err) {
       return res.json([]);
     }
 
     res.json(results);
-
   });
-
 });
 
 // ================= DELETE JOB =================
 
 app.get('/admin/delete-job/:id', isAdmin, (req, res) => {
-
   const id = req.params.id;
 
   db.query('DELETE FROM jobs WHERE id = ?', [id], (err) => {
-
     if (err) {
-
       return res.send(`
         <script>
           alert('Delete Failed');
           window.location.href='/admin-dashboard.html';
         </script>
       `);
-
     }
 
     res.send(`
@@ -265,15 +225,12 @@ app.get('/admin/delete-job/:id', isAdmin, (req, res) => {
         window.location.href='/admin-dashboard.html';
       </script>
     `);
-
   });
-
 });
 
 // ================= APPLY JOB =================
 
 app.post(
-
   '/apply',
 
   upload.fields([
@@ -284,7 +241,6 @@ app.post(
   ]),
 
   (req, res) => {
-
     const {
       job_id,
       full_name,
@@ -335,9 +291,7 @@ app.post(
         pan_card,
         resume,
       ],
-
       (err) => {
-
         if (err) {
           return res.send(err.message);
         }
@@ -348,18 +302,14 @@ app.post(
             window.location.href='/';
           </script>
         `);
-
       }
     );
-
   }
-
 );
 
 // ================= VIEW APPLICATIONS =================
 
 app.get('/admin/applications', isAdmin, (req, res) => {
-
   const sql = `
     SELECT applications.*, jobs.title AS job_title
     FROM applications
@@ -368,7 +318,6 @@ app.get('/admin/applications', isAdmin, (req, res) => {
   `;
 
   db.query(sql, (err, results) => {
-
     if (err) {
       return res.send('Error fetching applications');
     }
@@ -377,6 +326,8 @@ app.get('/admin/applications', isAdmin, (req, res) => {
 <!DOCTYPE html>
 <html>
 <head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Applications</title>
 
 <style>
@@ -388,43 +339,70 @@ font-family:Segoe UI;
 background:linear-gradient(135deg,#2563eb,#0f172a);
 }
 
+.page{
+max-width:1200px;
+margin:auto;
+}
+
+.top-card{
+background:rgba(255,255,255,0.12);
+padding:30px;
+border-radius:24px;
+color:white;
+margin-bottom:30px;
+}
+
 .application-card{
 background:white;
 padding:25px;
 border-radius:20px;
 margin-bottom:20px;
+box-shadow:0 10px 30px rgba(0,0,0,0.15);
 }
 
 .file-image{
-width:200px;
-border-radius:10px;
+width:100%;
+max-width:250px;
+border-radius:12px;
+margin-bottom:10px;
 }
 
 .btn{
 display:inline-block;
-padding:10px 15px;
+padding:10px 18px;
 background:#2563eb;
 color:white;
 text-decoration:none;
-border-radius:8px;
+border-radius:10px;
 margin-top:10px;
 }
 
-</style>
+.empty{
+background:white;
+padding:30px;
+border-radius:20px;
+text-align:center;
+}
 
+</style>
 </head>
 
 <body>
 
-<h1 style="color:white;">Applications</h1>
-<a href="/admin-dashboard.html" style="color:white;">Back</a>
+<div class="page">
 
+<div class="top-card">
+<h1>📋 All Applications</h1>
+<a href="/admin-dashboard.html" style="color:white;">← Back</a>
+</div>
 `;
 
+    if (results.length === 0) {
+      html += `<div class="empty">No Applications Found</div>`;
+    }
+
     results.forEach((row) => {
-
       html += `
-
 <div class="application-card">
 
 <h2>${row.full_name}</h2>
@@ -433,9 +411,21 @@ margin-top:10px;
 <p><strong>Mobile:</strong> ${row.mobile}</p>
 <p><strong>Age:</strong> ${row.age}</p>
 <p><strong>Gender:</strong> ${row.gender}</p>
+<p><strong>Marital Status:</strong> ${row.marital_status}</p>
+<p><strong>Current Address:</strong> ${row.current_address}</p>
+<p><strong>Permanent Address:</strong> ${row.permanent_address}</p>
 
 <p><strong>Photo:</strong></p>
 ${row.photo ? `<img class="file-image" src="${row.photo}">` : 'Not uploaded'}
+
+<p><strong>Aadhaar:</strong></p>
+${row.aadhaar ? `<img class="file-image" src="${row.aadhaar}">` : 'Not uploaded'}
+
+<p><strong>PAN:</strong></p>
+${row.pan_card ? `<img class="file-image" src="${row.pan_card}">` : 'Not uploaded'}
+
+<p><strong>Resume:</strong></p>
+${row.resume ? `<a class="btn" href="${row.resume}" target="_blank">View Resume</a>` : 'Not uploaded'}
 
 <br><br>
 
@@ -443,35 +433,31 @@ ${row.photo ? `<img class="file-image" src="${row.photo}">` : 'Not uploaded'}
 href="/admin/delete-application/${row.id}"
 class="btn"
 style="background:red;"
+onclick="return confirm('Delete this application?')"
 >
 Delete Application
 </a>
 
 </div>
-
 `;
-
     });
 
     html += `
+</div>
 </body>
 </html>
 `;
 
     res.send(html);
-
   });
-
 });
 
 // ================= DELETE APPLICATION =================
 
 app.get('/admin/delete-application/:id', isAdmin, (req, res) => {
-
   const id = req.params.id;
 
   db.query('DELETE FROM applications WHERE id = ?', [id], (err) => {
-
     if (err) {
       return res.send('Delete Failed');
     }
@@ -482,9 +468,7 @@ app.get('/admin/delete-application/:id', isAdmin, (req, res) => {
         window.location.href='/admin/applications';
       </script>
     `);
-
   });
-
 });
 
 // ================= START SERVER =================
