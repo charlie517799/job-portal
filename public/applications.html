@@ -188,7 +188,7 @@ Is poore code ko copy karke `public/applications.html` file me paste karo.
             <td>${app.permanent_address || ''}</td>
             <td>${app.current_address || ''}</td>
             <td>
-              ${app.photo ? `<a href="${app.photo}" target="_blank"><img src="${app.photo}" alt="Photo"></a>` : 'N/A'}
+              ${app.photo ? (app.photo.toLowerCase().endsWith('.pdf') ? `<a class="file-link" href="${app.photo}" target="_blank">View PDF</a>` : `<a href="${app.photo}" target="_blank"><img src="${app.photo}" alt="Photo"></a>`) : 'N/A'}
             </td>
             <td>
               ${app.aadhaar ? `<a class="file-link" href="${app.aadhaar}" target="_blank">View</a>` : 'N/A'}
@@ -242,4 +242,4 @@ git push
 5. Open karo:
    [https://job-portal-mdfk.onrender.com/admin/applications](https://job-portal-mdfk.onrender.com/admin/applications)
 
-Ab Age, DOB, Gender, Marital Status, Addresses, aur sabhi files dikh
+Ab Age, DOB, Gender, Marital Status, Addresses, aur sabhi files dikhenge.
