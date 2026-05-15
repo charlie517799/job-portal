@@ -199,37 +199,54 @@ app.post('/admin/add-job', isAdmin, (req, res) => {
 // ================= GET JOBS =================
 
 app.get('/api/jobs', (req, res) => {
-  db.query('SELECT * FROM jobs ORDER BY id DESC', (err, results) => {
-    if (err) {
-      return res.json([]);
-    }
 
-    res.json(results);
-  });
+  db.query(
+    'SELECT * FROM jobs ORDER BY id DESC',
+    (err, results) => {
+
+      if (err) {
+        return res.json([]);
+      }
+
+      res.json(results);
+
+    }
+  );
+
 });
 
 // ================= DELETE JOB =================
 
 app.get('/admin/delete-job/:id', isAdmin, (req, res) => {
+
   const id = req.params.id;
 
-  db.query('DELETE FROM jobs WHERE id = ?', [id], (err) => {
-    if (err) {
-      return res.send(`
+  db.query(
+    'DELETE FROM jobs WHERE id = ?',
+    [id],
+    (err) => {
+
+      if (err) {
+
+        return res.send(`
+          <script>
+            alert('Delete Failed');
+            window.location.href='/admin-dashboard.html';
+          </script>
+        `);
+
+      }
+
+      res.send(`
         <script>
-          alert('Delete Failed');
+          alert('Job Deleted Successfully');
           window.location.href='/admin-dashboard.html';
         </script>
       `);
-    }
 
-    res.send(`
-      <script>
-        alert('Job Deleted Successfully');
-        window.location.href='/admin-dashboard.html';
-      </script>
-    `);
-  });
+    }
+  );
+
 });
 
 // ================= APPLY JOB =================
@@ -245,6 +262,7 @@ app.post(
   ]),
 
   (req, res) => {
+
     const {
       job_id,
       full_name,
@@ -262,9 +280,8 @@ app.post(
     const pan_card = req.files?.pan_card?.[0]?.path || null;
     const resume = req.files?.resume?.[0]?.path || null;
 
-    db.query(
-      `INSERT INTO applications
-      (
+    const sql = `
+      INSERT INTO applications (
         job_id,
         full_name,
         mobile,
@@ -279,7 +296,11 @@ app.post(
         pan_card,
         resume
       )
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `;
+
+    db.query(
+      sql,
       [
         job_id,
         full_name,
@@ -296,6 +317,7 @@ app.post(
         resume,
       ],
       (err) => {
+
         if (err) {
           return res.send(err.message);
         }
@@ -306,8 +328,10 @@ app.post(
             window.location.href='/';
           </script>
         `);
+
       }
     );
+
   }
 );
 
@@ -340,20 +364,24 @@ app.get('/admin/delete-application/:id', isAdmin, (req, res) => {
 
   const id = req.params.id;
 
-  db.query('DELETE FROM applications WHERE id = ?', [id], (err) => {
+  db.query(
+    'DELETE FROM applications WHERE id = ?',
+    [id],
+    (err) => {
 
-    if (err) {
-      return res.send('Delete Failed');
+      if (err) {
+        return res.send('Delete Failed');
+      }
+
+      res.send(`
+        <script>
+          alert('Application Deleted Successfully');
+          window.location.href='/admin/applications';
+        </script>
+      `);
+
     }
-
-    res.send(`
-      <script>
-        alert('Application Deleted Successfully');
-        window.location.href='/admin/applications';
-      </script>
-    `);
-
-  });
+  );
 
 });
 
