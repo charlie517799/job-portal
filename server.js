@@ -110,13 +110,21 @@ db.connect((err) => {
 
 const storage = new CloudinaryStorage({
   cloudinary: cloudinary,
-  params: {
-    folder: 'job-portal',
-    allowed_formats: ['jpg', 'jpeg', 'png', 'pdf'],
+  params: async (req, file) => {
+    return {
+      folder: 'job-portal',
+      resource_type: 'auto',
+      allowed_formats: ['jpg', 'jpeg', 'png', 'pdf'],
+    };
   },
 });
 
-const upload = multer({ storage });
+const upload = multer({
+  storage,
+  limits: {
+    fileSize: 5 * 1024 * 1024,
+  },
+});
 
 // ================= ADMIN MIDDLEWARE =================
 
@@ -254,83 +262,122 @@ app.get('/admin/delete-job/:id', isAdmin, (req, res) => {
 app.post(
   '/apply',
 
-  upload.fields([
-    { name: 'photo', maxCount: 1 },
-    { name: 'aadhaar', maxCount: 1 },
-    { name: 'pan_card', maxCount: 1 },
-    { name: 'resume', maxCount: 1 },
-  ]),
+  (req, res, next) => {
 
-  (req, res) => {
+    upload.fields([
+      { name: 'photo', maxCount: 1 },
+      { name: 'aadhaar', maxCount: 1 },
+      { name: 'pan_card', maxCount: 1 },
+      { name: 'resume', maxCount: 1 },
+    ])(req, res, function (err) {
 
-    const {
-      job_id,
-      full_name,
-      mobile,
-      age,
-      dob,
-      gender,
-      marital_status,
-      permanent_address,
-      current_address,
-    } = req.body;
+      if (err) {
 
-    const photo = req.files?.photo?.[0]?.path || null;
-    const aadhaar = req.files?.aadhaar?.[0]?.path || null;
-    const pan_card = req.files?.pan_card?.[0]?.path || null;
-    const resume = req.files?.resume?.[0]?.path || null;
+        console.log('UPLOAD ERROR:', err);
 
-    const sql = `
-      INSERT INTO applications (
-        job_id,
-        full_name,
-        mobile,
-        age,
-        dob,
-        gender,
-        marital_status,
-        permanent_address,
-        current_address,
-        photo,
-        aadhaar,
-        pan_card,
-        resume
-      )
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    `;
-
-    db.query(
-      sql,
-      [
-        job_id,
-        full_name,
-        mobile,
-        age,
-        dob,
-        gender,
-        marital_status,
-        permanent_address,
-        current_address,
-        photo,
-        aadhaar,
-        pan_card,
-        resume,
-      ],
-      (err) => {
-
-        if (err) {
-          return res.send(err.message);
-        }
-
-        res.send(`
-          <script>
-            alert('Application Submitted Successfully!');
-            window.location.href='/';
-          </script>
+        return res.send(`
+          <h2>Upload Error</h2>
+          <p>${err.message}</p>
         `);
 
       }
-    );
+
+      next();
+
+    });
+
+  },
+
+  (req, res) => {
+
+    try {
+
+      const {
+        job_id,
+        full_name,
+        mobile,
+        age,
+        dob,
+        gender,
+        marital_status,
+        permanent_address,
+        current_address,
+      } = req.body;
+
+      const photo = req.files?.photo?.[0]?.path || '';
+      const aadhaar = req.files?.aadhaar?.[0]?.path || '';
+      const pan_card = req.files?.pan_card?.[0]?.path || '';
+      const resume = req.files?.resume?.[0]?.path || '';
+
+      const sql = `
+        INSERT INTO applications (
+          job_id,
+          full_name,
+          mobile,
+          age,
+          dob,
+          gender,
+          marital_status,
+          permanent_address,
+          current_address,
+          photo,
+          aadhaar,
+          pan_card,
+          resume
+        )
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      `;
+
+      db.query(
+        sql,
+        [
+          job_id,
+          full_name,
+          mobile,
+          age,
+          dob,
+          gender,
+          marital_status,
+          permanent_address,
+          current_address,
+          photo,
+          aadhaar,
+          pan_card,
+          resume,
+        ],
+        (err) => {
+
+          if (err) {
+
+            console.log('MYSQL ERROR:', err);
+
+            return res.send(`
+              <h2>Database Error</h2>
+              <p>${err.message}</p>
+            `);
+
+          }
+
+          res.send(`
+            <script>
+              alert('Application Submitted Successfully!');
+              window.location.href='/';
+            </script>
+          `);
+
+        }
+      );
+
+    } catch (error) {
+
+      console.log('SERVER ERROR:', error);
+
+      res.send(`
+        <h2>Server Error</h2>
+        <p>${error.message}</p>
+      `);
+
+    }
 
   }
 );
