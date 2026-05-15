@@ -1,3 +1,8 @@
+# Full Working `server.js`
+
+Is poore code ko copy karke apne existing `server.js` file ko replace kar do.
+
+```javascript
 require('dotenv').config();
 
 const express = require('express');
@@ -39,6 +44,9 @@ app.use(
     secret: process.env.SESSION_SECRET || 'jobportal_secret_key',
     resave: false,
     saveUninitialized: false,
+    cookie: {
+      maxAge: 24 * 60 * 60 * 1000,
+    },
   })
 );
 
@@ -101,13 +109,20 @@ db.connect((err) => {
 });
 
 // ================= CLOUDINARY STORAGE =================
+// PDF files = raw upload
+// Images = image upload
 
 const storage = new CloudinaryStorage({
   cloudinary,
-  params: async () => ({
-    folder: 'job-portal',
-    resource_type: 'auto',
-  }),
+  params: async (req, file) => {
+    const isPdf = file.mimetype === 'application/pdf';
+
+    return {
+      folder: 'job-portal',
+      resource_type: isPdf ? 'raw' : 'image',
+      public_id: `${Date.now()}-${file.originalname.replace(/\.[^/.]+$/, '')}`,
+    };
+  },
 });
 
 const upload = multer({
@@ -191,6 +206,7 @@ app.post('/admin/add-job', isAdmin, (req, res) => {
 app.get('/api/jobs', (req, res) => {
   db.query('SELECT * FROM jobs ORDER BY id DESC', (err, results) => {
     if (err) {
+      console.log('Error fetching jobs:', err);
       return res.json([]);
     }
 
@@ -328,14 +344,12 @@ app.post(
 );
 
 // ================= ADMIN APPLICATIONS PAGE =================
-// IMPORTANT: Ye route HTML page open karega
 
 app.get('/admin/applications', isAdmin, (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'applications.html'));
 });
 
 // ================= APPLICATIONS API =================
-// JSON sirf is route par milega
 
 app.get('/api/applications', isAdmin, (req, res) => {
   const sql = `
@@ -384,3 +398,25 @@ app.get('/admin/delete-application/:id', isAdmin, (req, res) => {
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
 });
+```
+
+---
+
+## GitHub Par Upload Karne Ke Commands
+
+```bash
+git add .
+git commit -m "Fixed PDF upload support"
+git push
+```
+
+---
+
+## Deploy Hone Ke Baad
+
+1. 1–2 minute wait karo.
+2. Naya application submit karo.
+3. PDF file upload karo.
+4. Admin panel me `View PDF` par click karo.
+
+Ab PDF aur image dono sahi se open honge.
