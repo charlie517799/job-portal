@@ -1,4 +1,4 @@
-# Full Working `server.js`
+# Final Working `server.js`
 
 Is poore code ko copy karke apne existing `server.js` file ko replace kar do.
 
@@ -74,7 +74,6 @@ db.connect((err) => {
 
   console.log('MySQL Connected Successfully');
 
-  // Jobs Table
   db.query(`
     CREATE TABLE IF NOT EXISTS jobs (
       id INT AUTO_INCREMENT PRIMARY KEY,
@@ -86,7 +85,6 @@ db.connect((err) => {
     )
   `);
 
-  // Applications Table
   db.query(`
     CREATE TABLE IF NOT EXISTS applications (
       id INT AUTO_INCREMENT PRIMARY KEY,
@@ -109,18 +107,21 @@ db.connect((err) => {
 });
 
 // ================= CLOUDINARY STORAGE =================
-// PDF files = raw upload
-// Images = image upload
+// PDF => raw
+// Images => image
 
 const storage = new CloudinaryStorage({
   cloudinary,
   params: async (req, file) => {
-    const isPdf = file.mimetype === 'application/pdf';
+    const isPdf =
+      file.mimetype === 'application/pdf' ||
+      file.originalname.toLowerCase().endsWith('.pdf');
 
     return {
       folder: 'job-portal',
       resource_type: isPdf ? 'raw' : 'image',
-      public_id: `${Date.now()}-${file.originalname.replace(/\.[^/.]+$/, '')}`,
+      use_filename: true,
+      unique_filename: true,
     };
   },
 });
@@ -128,7 +129,7 @@ const storage = new CloudinaryStorage({
 const upload = multer({
   storage,
   limits: {
-    fileSize: 5 * 1024 * 1024, // 5MB
+    fileSize: 5 * 1024 * 1024,
   },
 });
 
@@ -334,7 +335,6 @@ app.post(
       );
     } catch (error) {
       console.log('SERVER ERROR:', error);
-
       res.send(`
         <h2>Server Error</h2>
         <p>${error.message}</p>
@@ -400,23 +400,20 @@ app.listen(PORT, () => {
 });
 ```
 
----
-
-## GitHub Par Upload Karne Ke Commands
+## Upload Commands
 
 ```bash
 git add .
-git commit -m "Fixed PDF upload support"
+git commit -m "Final working server.js"
 git push
 ```
 
----
-
-## Deploy Hone Ke Baad
+## Deploy Ke Baad
 
 1. 1–2 minute wait karo.
 2. Naya application submit karo.
-3. PDF file upload karo.
-4. Admin panel me `View PDF` par click karo.
+3. PDF/JPG/PNG upload karo.
+4. Admin panel me files open karke check karo.
 
-Ab PDF aur image dono sahi se open honge.
+Admin panel:
+[https://job-portal-mdfk.onrender.com/admin/applications](https://job-portal-mdfk.onrender.com/admin/applications)
