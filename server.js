@@ -114,10 +114,12 @@ db.connect((err) => {
 
 const storage = new CloudinaryStorage({
   cloudinary: cloudinary,
-  params: {
+
+  params: async (req, file) => ({
     folder: 'job-portal',
     resource_type: 'auto',
-  },
+  }),
+
 });
 
 const upload = multer({
