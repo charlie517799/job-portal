@@ -3,150 +3,18 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Admin Dashboard</title>
+<title>Job Portal Administration</title>
 
-<style>
-body {
-  margin: 0;
-  padding: 0;
-  font-family: 'Segoe UI', sans-serif;
-  background: linear-gradient(135deg, #2563eb, #0f172a);
-  min-height: 100vh;
-}
-
-.container {
-  max-width: 1000px;
-  margin: 40px auto;
-  background: #fff;
-  padding: 30px;
-  border-radius: 20px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-}
-
-h1 {
-  text-align: center;
-  margin-bottom: 30px;
-  color: #111827;
-}
-
-h2 {
-  margin-top: 30px;
-  color: #2563eb;
-}
-
-form {
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-}
-
-input, select, textarea {
-  padding: 14px;
-  border-radius: 10px;
-  border: 1px solid #d1d5db;
-  font-size: 16px;
-  outline: none;
-}
-
-textarea {
-  min-height: 120px;
-  resize: none;
-}
-
-button {
-  padding: 14px;
-  border: none;
-  border-radius: 10px;
-  background: #2563eb;
-  color: white;
-  font-size: 16px;
-  cursor: pointer;
-}
-
-button:hover {
-  background: #1d4ed8;
-}
-
-.top-buttons {
-  display: flex;
-  gap: 15px;
-  margin-top: 20px;
-  flex-wrap: wrap;
-}
-
-.top-buttons a {
-  text-decoration: none;
-}
-
-.top-buttons button {
-  width: auto;
-}
-
-.logout-btn {
-  background: red;
-}
-
-.logout-btn:hover {
-  background: darkred;
-}
-
-.jobs-container,
-.applications-container {
-  margin-top: 40px;
-}
-
-.job-card,
-.application-card {
-  background: #f9fafb;
-  padding: 20px;
-  border-radius: 16px;
-  margin-bottom: 20px;
-  border: 1px solid #e5e7eb;
-}
-
-.job-card h3,
-.application-card h3 {
-  margin-top: 0;
-  color: #111827;
-}
-
-.delete-btn {
-  display: inline-block;
-  padding: 10px 16px;
-  background: red;
-  color: white;
-  text-decoration: none;
-  border-radius: 8px;
-  margin-top: 10px;
-}
-
-.delete-btn:hover {
-  background: darkred;
-}
-
-.empty {
-  text-align: center;
-  padding: 20px;
-  background: #f3f4f6;
-  border-radius: 12px;
-}
-
-.file-link {
-  display: inline-block;
-  margin: 5px 10px 5px 0;
-  color: #2563eb;
-  text-decoration: none;
-  font-weight: 600;
-}
-</style>
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
 
 <div class="container">
 
-  <h1>⚡ Admin Dashboard</h1>
+  <h1>Job Portal Administration</h1>
 
-  <h2>Post New Job</h2>
+  <!-- Post New Job -->
+  <h2>Create New Job Posting</h2>
 
   <form action="/admin/add-job" method="POST">
     <input type="text" name="title" placeholder="Job Title" required>
@@ -164,25 +32,26 @@ button:hover {
     <button type="submit">Post Job</button>
   </form>
 
+  <!-- Top Buttons -->
   <div class="top-buttons">
     <a href="#applications-section">
-      <button type="button">📋 View Applications</button>
+      <button type="button">View Applications</button>
     </a>
 
     <a href="/admin/logout">
-      <button type="button" class="logout-btn">🚪 Logout</button>
+      <button type="button" class="logout-btn">Logout</button>
     </a>
   </div>
 
-  <!-- Posted Jobs -->
+  <!-- Jobs Section -->
   <div class="jobs-container">
-    <h2>📌 Posted Jobs</h2>
+    <h2>Active Job Listings</h2>
     <div id="jobs-list"></div>
   </div>
 
-  <!-- Applications -->
+  <!-- Applications Section -->
   <div class="applications-container" id="applications-section">
-    <h2>📋 All Applications</h2>
+    <h2>Candidate Applications</h2>
     <div id="applications-list"></div>
   </div>
 
@@ -198,7 +67,8 @@ async function loadJobs() {
     jobsList.innerHTML = '';
 
     if (!jobs.length) {
-      jobsList.innerHTML = '<div class="empty">No Jobs Posted Yet</div>';
+      jobsList.innerHTML =
+        '<div class="empty">No jobs posted yet.</div>';
       return;
     }
 
@@ -210,16 +80,20 @@ async function loadJobs() {
           <p><strong>Location:</strong> ${job.location || ''}</p>
           <p>${job.description || ''}</p>
 
-          <a href="/admin/delete-job/${job.id}"
-             class="delete-btn"
-             onclick="return confirm('Delete this job?')">
-             Delete Job
+          <a
+            href="/admin/delete-job/${job.id}"
+            class="delete-btn"
+            onclick="return confirm('Are you sure you want to delete this job?')"
+          >
+            Delete Job
           </a>
         </div>
       `;
     });
   } catch (error) {
     console.error('Error loading jobs:', error);
+    document.getElementById('jobs-list').innerHTML =
+      '<div class="empty">Unable to load jobs.</div>';
   }
 }
 
@@ -237,7 +111,7 @@ async function loadApplications() {
 
     if (!applications.length) {
       applicationsList.innerHTML =
-        '<div class="empty">No Applications Yet</div>';
+        '<div class="empty">No applications yet.</div>';
       return;
     }
 
@@ -245,26 +119,27 @@ async function loadApplications() {
       applicationsList.innerHTML += `
         <div class="application-card">
           <h3>${app.full_name}</h3>
+
           <p><strong>Applied For:</strong> ${app.job_title || 'N/A'}</p>
           <p><strong>Mobile:</strong> ${app.mobile || ''}</p>
           <p><strong>Age:</strong> ${app.age || ''}</p>
-          <p><strong>DOB:</strong> ${app.dob || ''}</p>
+          <p><strong>Date of Birth:</strong> ${app.dob || ''}</p>
           <p><strong>Gender:</strong> ${app.gender || ''}</p>
           <p><strong>Marital Status:</strong> ${app.marital_status || ''}</p>
           <p><strong>Permanent Address:</strong> ${app.permanent_address || ''}</p>
           <p><strong>Current Address:</strong> ${app.current_address || ''}</p>
 
-          ${app.photo ? `<a class="file-link" href="${app.photo}" target="_blank">📷 Photo</a>` : ''}
-          ${app.aadhaar ? `<a class="file-link" href="${app.aadhaar}" target="_blank">🪪 Aadhaar</a>` : ''}
-          ${app.pan_card ? `<a class="file-link" href="${app.pan_card}" target="_blank">🆔 PAN Card</a>` : ''}
-          ${app.resume ? `<a class="file-link" href="${app.resume}" target="_blank">📄 Resume</a>` : ''}
+          ${app.photo ? `<a class="file-link" href="${app.photo}" target="_blank">Photo</a>` : ''}
+          ${app.aadhaar ? `<a class="file-link" href="${app.aadhaar}" target="_blank">Aadhaar</a>` : ''}
+          ${app.pan_card ? `<a class="file-link" href="${app.pan_card}" target="_blank">PAN Card</a>` : ''}
+          ${app.resume ? `<a class="file-link" href="${app.resume}" target="_blank">Resume</a>` : ''}
         </div>
       `;
     });
   } catch (error) {
     console.error('Error loading applications:', error);
     document.getElementById('applications-list').innerHTML =
-      '<div class="empty">Unable to load applications</div>';
+      '<div class="empty">Unable to load applications.</div>';
   }
 }
 
