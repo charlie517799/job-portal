@@ -1,260 +1,275 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Admin Dashboard</title>
 
-<link rel="stylesheet" href="style.css">
-
 <style>
-
-body{
-margin:0;
-padding:0;
-font-family:Segoe UI;
-background:linear-gradient(135deg,#2563eb,#0f172a);
-min-height:100vh;
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Segoe UI', sans-serif;
+  background: linear-gradient(135deg, #2563eb, #0f172a);
+  min-height: 100vh;
 }
 
-.container{
-max-width:900px;
-margin:40px auto;
-background:white;
-padding:30px;
-border-radius:20px;
-box-shadow:0 10px 30px rgba(0,0,0,0.2);
+.container {
+  max-width: 1000px;
+  margin: 40px auto;
+  background: #fff;
+  padding: 30px;
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.2);
 }
 
-h1{
-text-align:center;
-margin-bottom:30px;
-color:#111827;
+h1 {
+  text-align: center;
+  margin-bottom: 30px;
+  color: #111827;
 }
 
-h2{
-margin-top:20px;
-color:#2563eb;
+h2 {
+  margin-top: 30px;
+  color: #2563eb;
 }
 
-form{
-display:flex;
-flex-direction:column;
-gap:15px;
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
 }
 
-input,
-select,
-textarea{
-padding:14px;
-border-radius:10px;
-border:1px solid #d1d5db;
-font-size:16px;
-outline:none;
+input, select, textarea {
+  padding: 14px;
+  border-radius: 10px;
+  border: 1px solid #d1d5db;
+  font-size: 16px;
+  outline: none;
 }
 
-textarea{
-min-height:120px;
-resize:none;
+textarea {
+  min-height: 120px;
+  resize: none;
 }
 
-button{
-padding:14px;
-border:none;
-border-radius:10px;
-background:#2563eb;
-color:white;
-font-size:16px;
-cursor:pointer;
-transition:0.3s;
+button {
+  padding: 14px;
+  border: none;
+  border-radius: 10px;
+  background: #2563eb;
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
 }
 
-button:hover{
-background:#1d4ed8;
+button:hover {
+  background: #1d4ed8;
 }
 
-.top-buttons{
-display:flex;
-gap:15px;
-margin-top:20px;
-flex-wrap:wrap;
+.top-buttons {
+  display: flex;
+  gap: 15px;
+  margin-top: 20px;
+  flex-wrap: wrap;
 }
 
-.jobs-container{
-margin-top:40px;
+.top-buttons a {
+  text-decoration: none;
 }
 
-.job-card{
-background:#f9fafb;
-padding:20px;
-border-radius:16px;
-margin-bottom:20px;
-border:1px solid #e5e7eb;
+.top-buttons button {
+  width: auto;
 }
 
-.job-card h3{
-margin-top:0;
-color:#111827;
+.logout-btn {
+  background: red;
 }
 
-.delete-btn{
-display:inline-block;
-padding:10px 16px;
-background:red;
-color:white;
-text-decoration:none;
-border-radius:8px;
-margin-top:10px;
+.logout-btn:hover {
+  background: darkred;
 }
 
-.delete-btn:hover{
-background:darkred;
+.jobs-container,
+.applications-container {
+  margin-top: 40px;
 }
 
-.empty{
-text-align:center;
-padding:20px;
-background:#f3f4f6;
-border-radius:12px;
+.job-card,
+.application-card {
+  background: #f9fafb;
+  padding: 20px;
+  border-radius: 16px;
+  margin-bottom: 20px;
+  border: 1px solid #e5e7eb;
 }
 
+.job-card h3,
+.application-card h3 {
+  margin-top: 0;
+  color: #111827;
+}
+
+.delete-btn {
+  display: inline-block;
+  padding: 10px 16px;
+  background: red;
+  color: white;
+  text-decoration: none;
+  border-radius: 8px;
+  margin-top: 10px;
+}
+
+.delete-btn:hover {
+  background: darkred;
+}
+
+.empty {
+  text-align: center;
+  padding: 20px;
+  background: #f3f4f6;
+  border-radius: 12px;
+}
+
+.file-link {
+  display: inline-block;
+  margin: 5px 10px 5px 0;
+  color: #2563eb;
+  text-decoration: none;
+  font-weight: 600;
+}
 </style>
-
 </head>
-
 <body>
 
 <div class="container">
 
-<h1>⚡ Admin Dashboard</h1>
+  <h1>⚡ Admin Dashboard</h1>
 
-<h2>Post New Job</h2>
+  <h2>Post New Job</h2>
 
-<form action="/admin/add-job" method="POST">
+  <form action="/admin/add-job" method="POST">
+    <input type="text" name="title" placeholder="Job Title" required>
 
-<input
-type="text"
-name="title"
-placeholder="Job Title"
-required
->
+    <select name="company" required>
+      <option value="">Select Category</option>
+      <option>Government</option>
+      <option>Corporate</option>
+    </select>
 
-<select name="company" required>
-<option value="">Select Category</option>
-<option>Government</option>
-<option>Corporate</option>
-</select>
+    <input type="text" name="location" placeholder="Location">
 
-<input
-type="text"
-name="location"
-placeholder="Location"
->
+    <textarea name="description" placeholder="Job Description"></textarea>
 
-<textarea
-name="description"
-placeholder="Job Description"
-></textarea>
+    <button type="submit">Post Job</button>
+  </form>
 
-<button type="submit">
-Post Job
-</button>
+  <div class="top-buttons">
+    <a href="#applications-section">
+      <button type="button">📋 View Applications</button>
+    </a>
 
-</form>
+    <a href="/admin/logout">
+      <button type="button" class="logout-btn">🚪 Logout</button>
+    </a>
+  </div>
 
-<div class="top-buttons">
+  <!-- Posted Jobs -->
+  <div class="jobs-container">
+    <h2>📌 Posted Jobs</h2>
+    <div id="jobs-list"></div>
+  </div>
 
-<a href="/admin/applications">
-<button type="button">
-📋 View Applications
-</button>
-</a>
-
-<a href="/admin/logout">
-<button
-type="button"
-style="background:red;"
->
-🚪 Logout
-</button>
-</a>
-
-</div>
-
-<div class="jobs-container">
-
-<h2>📌 Posted Jobs</h2>
-
-<div id="jobs-list"></div>
-
-</div>
+  <!-- Applications -->
+  <div class="applications-container" id="applications-section">
+    <h2>📋 All Applications</h2>
+    <div id="applications-list"></div>
+  </div>
 
 </div>
 
 <script>
-
 async function loadJobs() {
-
   try {
-
     const response = await fetch('/api/jobs');
-
     const jobs = await response.json();
 
     const jobsList = document.getElementById('jobs-list');
-
     jobsList.innerHTML = '';
 
-    if (jobs.length === 0) {
-
-      jobsList.innerHTML = `
-        <div class="empty">
-          No Jobs Posted Yet
-        </div>
-      `;
-
+    if (!jobs.length) {
+      jobsList.innerHTML = '<div class="empty">No Jobs Posted Yet</div>';
       return;
     }
 
-    jobs.forEach((job) => {
-
+    jobs.forEach(job => {
       jobsList.innerHTML += `
-
         <div class="job-card">
-
           <h3>${job.title}</h3>
+          <p><strong>Category:</strong> ${job.company || ''}</p>
+          <p><strong>Location:</strong> ${job.location || ''}</p>
+          <p>${job.description || ''}</p>
 
-          <p><strong>Category:</strong> ${job.company}</p>
-
-          <p><strong>Location:</strong> ${job.location}</p>
-
-          <p>${job.description}</p>
-
-          <a
-            href="/admin/delete-job/${job.id}"
-            class="delete-btn"
-            onclick="return confirm('Delete this job?')"
-          >
-            Delete Job
+          <a href="/admin/delete-job/${job.id}"
+             class="delete-btn"
+             onclick="return confirm('Delete this job?')">
+             Delete Job
           </a>
-
         </div>
-
       `;
     });
-
   } catch (error) {
-
-    console.log(error);
-
+    console.error('Error loading jobs:', error);
   }
+}
 
+async function loadApplications() {
+  try {
+    const response = await fetch('/api/applications');
+
+    if (!response.ok) {
+      throw new Error('Failed to fetch applications');
+    }
+
+    const applications = await response.json();
+    const applicationsList = document.getElementById('applications-list');
+    applicationsList.innerHTML = '';
+
+    if (!applications.length) {
+      applicationsList.innerHTML =
+        '<div class="empty">No Applications Yet</div>';
+      return;
+    }
+
+    applications.forEach(app => {
+      applicationsList.innerHTML += `
+        <div class="application-card">
+          <h3>${app.full_name}</h3>
+          <p><strong>Applied For:</strong> ${app.job_title || 'N/A'}</p>
+          <p><strong>Mobile:</strong> ${app.mobile || ''}</p>
+          <p><strong>Age:</strong> ${app.age || ''}</p>
+          <p><strong>DOB:</strong> ${app.dob || ''}</p>
+          <p><strong>Gender:</strong> ${app.gender || ''}</p>
+          <p><strong>Marital Status:</strong> ${app.marital_status || ''}</p>
+          <p><strong>Permanent Address:</strong> ${app.permanent_address || ''}</p>
+          <p><strong>Current Address:</strong> ${app.current_address || ''}</p>
+
+          ${app.photo ? `<a class="file-link" href="${app.photo}" target="_blank">📷 Photo</a>` : ''}
+          ${app.aadhaar ? `<a class="file-link" href="${app.aadhaar}" target="_blank">🪪 Aadhaar</a>` : ''}
+          ${app.pan_card ? `<a class="file-link" href="${app.pan_card}" target="_blank">🆔 PAN Card</a>` : ''}
+          ${app.resume ? `<a class="file-link" href="${app.resume}" target="_blank">📄 Resume</a>` : ''}
+        </div>
+      `;
+    });
+  } catch (error) {
+    console.error('Error loading applications:', error);
+    document.getElementById('applications-list').innerHTML =
+      '<div class="empty">Unable to load applications</div>';
+  }
 }
 
 loadJobs();
-
+loadApplications();
 </script>
 
 </body>
