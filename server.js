@@ -1,8 +1,3 @@
-# Final Working `server.js`
-
-Is poore code ko copy karke apne existing `server.js` file ko replace kar do.
-
-```javascript
 require('dotenv').config();
 
 const express = require('express');
@@ -17,6 +12,12 @@ const fs = require('fs');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
+
+// ================= ADS.TXT FIX (TOP PE RAKH) =================
+app.get('/ads.txt', (req, res) => {
+  res.set('Content-Type', 'text/plain');
+  res.send('google.com, pub-4484833601433628, DIRECT, f08c47fec0942fa0');
+});
 
 // ================= CLOUDINARY =================
 
@@ -50,16 +51,9 @@ app.use(
   })
 );
 
+// ⭐ STATIC FIX (IMPORTANT)
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/uploads', express.static(uploadsDir));
-
-
-app.get('/ads.txt', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'ads.txt'));
-});
-
-
-
 
 // ================= MYSQL CONNECTION =================
 
@@ -81,42 +75,9 @@ db.connect((err) => {
   }
 
   console.log('MySQL Connected Successfully');
-
-  db.query(`
-    CREATE TABLE IF NOT EXISTS jobs (
-      id INT AUTO_INCREMENT PRIMARY KEY,
-      title VARCHAR(255),
-      company VARCHAR(255),
-      location VARCHAR(255),
-      description TEXT,
-      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    )
-  `);
-
-  db.query(`
-    CREATE TABLE IF NOT EXISTS applications (
-      id INT AUTO_INCREMENT PRIMARY KEY,
-      job_id INT,
-      full_name VARCHAR(255),
-      mobile VARCHAR(50),
-      age VARCHAR(50),
-      dob VARCHAR(100),
-      gender VARCHAR(50),
-      marital_status VARCHAR(50),
-      permanent_address TEXT,
-      current_address TEXT,
-      photo TEXT,
-      aadhaar TEXT,
-      pan_card TEXT,
-      resume TEXT,
-      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    )
-  `);
 });
 
 // ================= CLOUDINARY STORAGE =================
-// PDF => raw
-// Images => image
 
 const storage = new CloudinaryStorage({
   cloudinary,
@@ -147,281 +108,19 @@ function isAdmin(req, res, next) {
   if (req.session.admin) {
     return next();
   }
-
   res.redirect('/admin-login.html');
 }
 
-// ================= HOME =================
+// ================= ROUTES =================
 
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-// ================= ADMIN LOGIN =================
-
-app.post('/admin/login', (req, res) => {
-  const { username, password } = req.body;
-
-  if (
-    username === (process.env.ADMIN_USERNAME || 'admin') &&
-    password === (process.env.ADMIN_PASSWORD || '251122')
-  ) {
-    req.session.admin = true;
-    return res.redirect('/admin-dashboard.html');
-  }
-
-  res.send(`
-    <script>
-      alert('Invalid Username or Password');
-      window.location.href='/admin-login.html';
-    </script>
-  `);
-});
-
-// ================= ADMIN LOGOUT =================
-
-app.get('/admin/logout', (req, res) => {
-  req.session.destroy(() => {
-    res.redirect('/admin-login.html');
-  });
-});
-
-// ================= ADD JOB =================
-
-app.post('/admin/add-job', isAdmin, (req, res) => {
-  const { title, company, location, description } = req.body;
-
-  const sql = `
-    INSERT INTO jobs (title, company, location, description)
-    VALUES (?, ?, ?, ?)
-  `;
-
-  db.query(sql, [title, company, location, description], (err) => {
-    if (err) {
-      return res.send(err.message);
-    }
-
-    res.send(`
-      <script>
-        alert('Job Posted Successfully!');
-        window.location.href='/admin-dashboard.html';
-      </script>
-    `);
-  });
-});
-
-// ================= GET JOBS =================
-
-app.get('/api/jobs', (req, res) => {
-  db.query('SELECT * FROM jobs ORDER BY id DESC', (err, results) => {
-    if (err) {
-      console.log('Error fetching jobs:', err);
-      return res.json([]);
-    }
-
-    res.json(results);
-  });
-});
-
-// ================= DELETE JOB =================
-
-app.get('/admin/delete-job/:id', isAdmin, (req, res) => {
-  const id = req.params.id;
-
-  db.query('DELETE FROM jobs WHERE id = ?', [id], (err) => {
-    if (err) {
-      return res.send(`
-        <script>
-          alert('Delete Failed');
-          window.location.href='/admin-dashboard.html';
-        </script>
-      `);
-    }
-
-    res.send(`
-      <script>
-        alert('Job Deleted Successfully');
-        window.location.href='/admin-dashboard.html';
-      </script>
-    `);
-  });
-});
-
-// ================= APPLY JOB =================
-
-app.post(
-  '/apply',
-  (req, res, next) => {
-    upload.fields([
-      { name: 'photo', maxCount: 1 },
-      { name: 'aadhaar', maxCount: 1 },
-      { name: 'pan_card', maxCount: 1 },
-      { name: 'resume', maxCount: 1 },
-    ])(req, res, function (err) {
-      if (err) {
-        console.log('UPLOAD ERROR:', err);
-        return res.send(`
-          <h2>Upload Error</h2>
-          <p>${err.message}</p>
-        `);
-      }
-
-      next();
-    });
-  },
-  (req, res) => {
-    try {
-      const {
-        job_id,
-        full_name,
-        mobile,
-        age,
-        dob,
-        gender,
-        marital_status,
-        permanent_address,
-        current_address,
-      } = req.body;
-
-      const photo = req.files?.photo?.[0]?.path || '';
-      const aadhaar = req.files?.aadhaar?.[0]?.path || '';
-      const pan_card = req.files?.pan_card?.[0]?.path || '';
-      const resume = req.files?.resume?.[0]?.path || '';
-
-      const sql = `
-        INSERT INTO applications (
-          job_id,
-          full_name,
-          mobile,
-          age,
-          dob,
-          gender,
-          marital_status,
-          permanent_address,
-          current_address,
-          photo,
-          aadhaar,
-          pan_card,
-          resume
-        )
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-      `;
-
-      db.query(
-        sql,
-        [
-          job_id,
-          full_name,
-          mobile,
-          age,
-          dob,
-          gender,
-          marital_status,
-          permanent_address,
-          current_address,
-          photo,
-          aadhaar,
-          pan_card,
-          resume,
-        ],
-        (err) => {
-          if (err) {
-            console.log('MYSQL ERROR:', err);
-            return res.send(`
-              <h2>Database Error</h2>
-              <p>${err.message}</p>
-            `);
-          }
-
-          res.send(`
-            <script>
-              alert('Application Submitted Successfully!');
-              window.location.href='/';
-            </script>
-          `);
-        }
-      );
-    } catch (error) {
-      console.log('SERVER ERROR:', error);
-      res.send(`
-        <h2>Server Error</h2>
-        <p>${error.message}</p>
-      `);
-    }
-  }
-);
-
-// ================= ADMIN APPLICATIONS PAGE =================
-
-app.get('/admin/applications', isAdmin, (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'applications.html'));
-});
-
-// ================= APPLICATIONS API =================
-
-app.get('/api/applications', isAdmin, (req, res) => {
-  const sql = `
-    SELECT applications.*, jobs.title AS job_title
-    FROM applications
-    LEFT JOIN jobs ON applications.job_id = jobs.id
-    ORDER BY applications.id DESC
-  `;
-
-  db.query(sql, (err, results) => {
-    if (err) {
-      console.log('Error fetching applications:', err);
-      return res.json([]);
-    }
-
-    res.json(results);
-  });
-});
-
-// ================= DELETE APPLICATION =================
-
-app.get('/admin/delete-application/:id', isAdmin, (req, res) => {
-  const id = req.params.id;
-
-  db.query('DELETE FROM applications WHERE id = ?', [id], (err) => {
-    if (err) {
-      return res.send(`
-        <script>
-          alert('Delete Failed');
-          window.location.href='/admin/applications';
-        </script>
-      `);
-    }
-
-    res.send(`
-      <script>
-        alert('Application Deleted Successfully');
-        window.location.href='/admin/applications';
-      </script>
-    `);
-  });
-});
+// बाकी tera sab code SAME rehne de (jobs, apply, admin, etc.)
 
 // ================= START SERVER =================
 
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
 });
-```
-
-## Upload Commands
-
-```bash
-git add .
-git commit -m "Final working server.js"
-git push
-```
-
-## Deploy Ke Baad
-
-1. 1–2 minute wait karo.
-2. Naya application submit karo.
-3. PDF/JPG/PNG upload karo.
-4. Admin panel me files open karke check karo.
-
-Admin panel:
-[https://job-portal-mdfk.onrender.com/admin/applications](https://job-portal-mdfk.onrender.com/admin/applications)
