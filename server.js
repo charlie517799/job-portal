@@ -1,4 +1,4 @@
-# server.js (Full Working Code)
+require('dotenv').config();
 
 ```javascript
 require('dotenv').config();
