@@ -53,6 +53,14 @@ app.use(
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/uploads', express.static(uploadsDir));
 
+
+app.get('/ads.txt', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'ads.txt'));
+});
+
+
+
+
 // ================= MYSQL CONNECTION =================
 
 const db = mysql.createConnection({
