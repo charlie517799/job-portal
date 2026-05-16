@@ -20,6 +20,9 @@ app.use(
     secret: process.env.SESSION_SECRET || 'jobportal_secret_key',
     resave: false,
     saveUninitialized: false,
+    cookie: {
+      maxAge: 24 * 60 * 60 * 1000, // 1 day
+    },
   })
 );
 
@@ -73,7 +76,7 @@ function isAdmin(req, res, next) {
   if (req.session.admin) {
     return next();
   }
-  res.redirect('/admin-login.html');
+  return res.redirect('/admin-login.html');
 }
 
 // ================= HOME =================
@@ -90,7 +93,9 @@ app.post('/admin/login', (req, res) => {
 
   if (username === adminUsername && password === adminPassword) {
     req.session.admin = true;
-    return res.redirect('/admin-dashboard.html');
+    return req.session.save(() => {
+      res.redirect('/admin-dashboard.html');
+    });
   }
 
   res.send(
@@ -103,6 +108,35 @@ app.get('/admin/logout', (req, res) => {
   req.session.destroy(() => {
     res.redirect('/admin-login.html');
   });
+});
+
+// ================= DELETE JOB =================
+app.get('/admin/delete-job/:id', isAdmin, (req, res) => {
+  const jobId = req.params.id;
+
+  // First delete all applications for this job
+  db.query(
+    'DELETE FROM applications WHERE job_id = ?',
+    [jobId],
+    (err) => {
+      if (err) {
+        console.error('Error deleting applications:', err);
+        return res.status(500).send('Error deleting applications');
+      }
+
+      // Then delete the job
+      db.query('DELETE FROM jobs WHERE id = ?', [jobId], (err2) => {
+        if (err2) {
+          console.error('Error deleting job:', err2);
+          return res.status(500).send('Error deleting job');
+        }
+
+        res.send(
+          "<script>alert('Job Deleted Successfully');window.location.href='/admin-dashboard.html';</script>"
+        );
+      });
+    }
+  );
 });
 
 // ================= ADD JOB =================
