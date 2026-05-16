@@ -17,7 +17,12 @@
   <h2>Create New Job Posting</h2>
 
   <form action="/admin/add-job" method="POST">
-    <input type="text" name="title" placeholder="Job Title" required>
+    <input
+      type="text"
+      name="title"
+      placeholder="Job Title"
+      required
+    >
 
     <select name="company" required>
       <option value="">Select Category</option>
@@ -25,16 +30,23 @@
       <option>Corporate</option>
     </select>
 
-    <input type="text" name="location" placeholder="Location">
+    <input
+      type="text"
+      name="location"
+      placeholder="Location"
+    >
 
-    <textarea name="description" placeholder="Job Description"></textarea>
+    <textarea
+      name="description"
+      placeholder="Job Description"
+    ></textarea>
 
     <button type="submit">Post Job</button>
   </form>
 
   <!-- Top Buttons -->
   <div class="top-buttons">
-    <a href="#applications-section">
+    <a href="/admin-applications.html">
       <button type="button">View Applications</button>
     </a>
 
@@ -49,21 +61,20 @@
     <div id="jobs-list"></div>
   </div>
 
-  <!-- Applications Section -->
-  <div class="applications-container" id="applications-section">
-    <h2>Candidate Applications</h2>
-    <div id="applications-list"></div>
-  </div>
-
 </div>
 
 <script>
 async function loadJobs() {
   try {
     const response = await fetch('/api/jobs');
-    const jobs = await response.json();
 
+    if (!response.ok) {
+      throw new Error('Failed to fetch jobs');
+    }
+
+    const jobs = await response.json();
     const jobsList = document.getElementById('jobs-list');
+
     jobsList.innerHTML = '';
 
     if (!jobs.length) {
@@ -76,8 +87,17 @@ async function loadJobs() {
       jobsList.innerHTML += `
         <div class="job-card">
           <h3>${job.title}</h3>
-          <p><strong>Category:</strong> ${job.company || ''}</p>
-          <p><strong>Location:</strong> ${job.location || ''}</p>
+
+          <p>
+            <strong>Category:</strong>
+            ${job.company || ''}
+          </p>
+
+          <p>
+            <strong>Location:</strong>
+            ${job.location || ''}
+          </p>
+
           <p>${job.description || ''}</p>
 
           <a
@@ -90,61 +110,16 @@ async function loadJobs() {
         </div>
       `;
     });
+
   } catch (error) {
     console.error('Error loading jobs:', error);
+
     document.getElementById('jobs-list').innerHTML =
       '<div class="empty">Unable to load jobs.</div>';
   }
 }
 
-async function loadApplications() {
-  try {
-    const response = await fetch('/api/applications');
-
-    if (!response.ok) {
-      throw new Error('Failed to fetch applications');
-    }
-
-    const applications = await response.json();
-    const applicationsList = document.getElementById('applications-list');
-    applicationsList.innerHTML = '';
-
-    if (!applications.length) {
-      applicationsList.innerHTML =
-        '<div class="empty">No applications yet.</div>';
-      return;
-    }
-
-    applications.forEach(app => {
-      applicationsList.innerHTML += `
-        <div class="application-card">
-          <h3>${app.full_name}</h3>
-
-          <p><strong>Applied For:</strong> ${app.job_title || 'N/A'}</p>
-          <p><strong>Mobile:</strong> ${app.mobile || ''}</p>
-          <p><strong>Age:</strong> ${app.age || ''}</p>
-          <p><strong>Date of Birth:</strong> ${app.dob || ''}</p>
-          <p><strong>Gender:</strong> ${app.gender || ''}</p>
-          <p><strong>Marital Status:</strong> ${app.marital_status || ''}</p>
-          <p><strong>Permanent Address:</strong> ${app.permanent_address || ''}</p>
-          <p><strong>Current Address:</strong> ${app.current_address || ''}</p>
-
-          ${app.photo ? `<a class="file-link" href="${app.photo}" target="_blank">Photo</a>` : ''}
-          ${app.aadhaar ? `<a class="file-link" href="${app.aadhaar}" target="_blank">Aadhaar</a>` : ''}
-          ${app.pan_card ? `<a class="file-link" href="${app.pan_card}" target="_blank">PAN Card</a>` : ''}
-          ${app.resume ? `<a class="file-link" href="${app.resume}" target="_blank">Resume</a>` : ''}
-        </div>
-      `;
-    });
-  } catch (error) {
-    console.error('Error loading applications:', error);
-    document.getElementById('applications-list').innerHTML =
-      '<div class="empty">Unable to load applications.</div>';
-  }
-}
-
 loadJobs();
-loadApplications();
 </script>
 
 </body>
