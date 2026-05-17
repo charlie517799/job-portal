@@ -21,7 +21,7 @@ app.use(
     resave: false,
     saveUninitialized: false,
     cookie: {
-      maxAge: 24 * 60 * 60 * 1000, // 1 day
+      maxAge: 24 * 60 * 60 * 1000,
     },
   })
 );
@@ -76,6 +76,7 @@ function isAdmin(req, res, next) {
   if (req.session.admin) {
     return next();
   }
+
   return res.redirect('/admin-login.html');
 }
 
@@ -99,9 +100,12 @@ app.post('/admin/login', (req, res) => {
     });
   }
 
-  res.send(
-    "<script>alert('Invalid Username or Password');window.location.href='/admin-login.html';</script>"
-  );
+  res.send(`
+    <script>
+      alert('Invalid Username or Password');
+      window.location.href='/admin-login.html';
+    </script>
+  `);
 });
 
 // ================= ADMIN LOGOUT =================
@@ -113,77 +117,114 @@ app.get('/admin/logout', (req, res) => {
 
 // ================= ADD JOB =================
 app.post('/admin/add-job', isAdmin, (req, res) => {
-  const { title, company, location, description } = req.body;
 
-  const sql =
-    'INSERT INTO jobs (title, company, location, description) VALUES (?, ?, ?, ?)';
+  const {
+    title,
+    company,
+    location,
+    description
+  } = req.body;
 
-  db.query(sql, [title, company, location, description], (err) => {
-    if (err) {
-      console.error('Error adding job:', err);
-      return res.status(500).send('Error adding job');
+  const sql = `
+    INSERT INTO jobs
+    (title, company, location, description)
+    VALUES (?, ?, ?, ?)
+  `;
+
+  db.query(
+    sql,
+    [title, company, location, description],
+    (err) => {
+
+      if (err) {
+        console.error('Error adding job:', err);
+        return res.status(500).send('Error adding job');
+      }
+
+      res.send(`
+        <script>
+          alert('Job Posted Successfully');
+          window.location.href='/admin-dashboard.html';
+        </script>
+      `);
+
     }
+  );
 
-    res.send(
-      "<script>alert('Job Posted Successfully');window.location.href='/admin-dashboard.html';</script>"
-    );
-  });
 });
 
 // ================= DELETE JOB =================
 app.get('/admin/delete-job/:id', isAdmin, (req, res) => {
+
   const jobId = req.params.id;
 
-  // First delete all applications related to this job
   db.query(
     'DELETE FROM applications WHERE job_id = ?',
     [jobId],
     (err) => {
+
       if (err) {
         console.error('Error deleting applications:', err);
         return res.status(500).send('Error deleting applications');
       }
 
-      // Then delete the job
-      db.query('DELETE FROM jobs WHERE id = ?', [jobId], (err2) => {
-        if (err2) {
-          console.error('Error deleting job:', err2);
-          return res.status(500).send('Error deleting job');
-        }
+      db.query(
+        'DELETE FROM jobs WHERE id = ?',
+        [jobId],
+        (err2) => {
 
-        res.send(
-          "<script>alert('Job Deleted Successfully');window.location.href='/admin-dashboard.html';</script>"
-        );
-      });
+          if (err2) {
+            console.error('Error deleting job:', err2);
+            return res.status(500).send('Error deleting job');
+          }
+
+          res.send(`
+            <script>
+              alert('Job Deleted Successfully');
+              window.location.href='/admin-dashboard.html';
+            </script>
+          `);
+
+        }
+      );
+
     }
   );
+
 });
 
 // ================= GET JOBS =================
 app.get('/api/jobs', (req, res) => {
+
   db.query(
     'SELECT * FROM jobs ORDER BY created_at DESC',
     (err, results) => {
+
       if (err) {
         console.error('Error fetching jobs:', err);
         return res.status(500).json([]);
       }
 
       res.json(results);
+
     }
   );
+
 });
 
 // ================= APPLY JOB =================
 app.post(
   '/apply',
+
   upload.fields([
     { name: 'photo', maxCount: 1 },
     { name: 'aadhaar', maxCount: 1 },
     { name: 'pan_card', maxCount: 1 },
     { name: 'resume', maxCount: 1 },
   ]),
+
   (req, res) => {
+
     const {
       job_id,
       full_name,
@@ -196,7 +237,6 @@ app.post(
       current_address,
     } = req.body;
 
-    // Cloudinary file URLs
     const photo = req.files?.photo?.[0]?.path || '';
     const aadhaar = req.files?.aadhaar?.[0]?.path || '';
     const pan_card = req.files?.pan_card?.[0]?.path || '';
@@ -238,24 +278,33 @@ app.post(
     ];
 
     db.query(sql, values, (err) => {
+
       if (err) {
         console.error('Error submitting application:', err);
-        return res.status(500).send('Error submitting application');
+
+        return res.status(500).send(`
+          <script>
+            alert('Error submitting application');
+            window.history.back();
+          </script>
+        `);
       }
 
-      // IMPORTANT: Success message instead of [object Object]
       res.send(`
         <script>
           alert('Application Submitted Successfully');
           window.location.href = '/';
         </script>
       `);
+
     });
+
   }
 );
 
 // ================= GET APPLICATIONS =================
 app.get('/api/applications', isAdmin, (req, res) => {
+
   const sql = `
     SELECT
       applications.*,
@@ -263,25 +312,57 @@ app.get('/api/applications', isAdmin, (req, res) => {
     FROM applications
     LEFT JOIN jobs
       ON applications.job_id = jobs.id
-    ORDER BY applications.created_at DESC
+    ORDER BY applications.id DESC
   `;
 
   db.query(sql, (err, results) => {
+
     if (err) {
       console.error('Error fetching applications:', err);
       return res.status(500).json([]);
     }
 
     res.json(results);
+
   });
+
+});
+
+// ================= DELETE APPLICATION =================
+app.delete('/api/applications/:id', isAdmin, (req, res) => {
+
+  const applicationId = req.params.id;
+
+  const sql = 'DELETE FROM applications WHERE id = ?';
+
+  db.query(sql, [applicationId], (err) => {
+
+    if (err) {
+
+      console.error('Error deleting application:', err);
+
+      return res.status(500).json({
+        message: 'Delete failed'
+      });
+
+    }
+
+    res.json({
+      message: 'Application deleted successfully'
+    });
+
+  });
+
 });
 
 // ================= HEALTH CHECK =================
 app.get('/health', (req, res) => {
+
   res.json({
     status: 'ok',
     message: 'Server is running successfully',
   });
+
 });
 
 // ================= START SERVER =================
