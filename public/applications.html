@@ -91,6 +91,21 @@ h1 {
 
   <h1>📋 All Applications</h1>
 
+  <input
+  type="text"
+  id="searchInput"
+  placeholder="Search by name, mobile or job title..."
+  style="
+    width:100%;
+    padding:15px;
+    border:1px solid #d1d5db;
+    border-radius:12px;
+    margin-bottom:25px;
+    font-size:15px;
+  "
+  onkeyup="searchApplications()"
+/>
+
   <div id="applications-list"></div>
 </div>
 
@@ -196,7 +211,34 @@ async function deleteApplication(id) {
     alert('Delete failed');
   }
 }
+function searchApplications() {
 
+  const input =
+    document.getElementById('searchInput')
+    .value
+    .toLowerCase();
+
+  const cards =
+    document.querySelectorAll('.application-card');
+
+  cards.forEach(card => {
+
+    const text =
+      card.innerText.toLowerCase();
+
+    if (text.includes(input)) {
+
+      card.style.display = 'block';
+
+    } else {
+
+      card.style.display = 'none';
+
+    }
+
+  });
+
+}
 loadApplications();
 </script>
 
