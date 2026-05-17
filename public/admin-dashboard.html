@@ -221,17 +221,17 @@ button:hover{
   <div class="stats">
 
     <div class="card">
-      <h2>24+</h2>
+      <h2 id="totalJobs">0</h2>
       <p>Total Jobs Posted</p>
     </div>
 
     <div class="card">
-      <h2>120+</h2>
+      <h2 id="totalApplications">0</h2>
       <p>Total Applications</p>
     </div>
 
     <div class="card">
-      <h2>100%</h2>
+      <h2 id="systemStatus">0%</h2>
       <p>System Working</p>
     </div>
 
@@ -301,6 +301,43 @@ button:hover{
   </div>
 
 </div>
+<script>
 
+async function loadDashboardStats() {
+
+  try {
+
+    const response =
+      await fetch('/api/dashboard-stats');
+
+    const data =
+      await response.json();
+
+    document.getElementById(
+      'totalJobs'
+    ).innerText =
+      data.totalJobs + '+';
+
+    document.getElementById(
+      'totalApplications'
+    ).innerText =
+      data.totalApplications + '+';
+
+    document.getElementById(
+      'systemStatus'
+    ).innerText =
+      data.systemStatus;
+
+  } catch (error) {
+
+    console.log(error);
+
+  }
+
+}
+
+loadDashboardStats();
+
+</script>
 </body>
 </html>

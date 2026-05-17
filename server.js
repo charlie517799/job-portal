@@ -356,16 +356,55 @@ app.delete('/api/applications/:id', isAdmin, (req, res) => {
 });
 
 // ================= HEALTH CHECK =================
-app.get('/health', (req, res) => {
+// ================= DASHBOARD STATS =================
+app.get('/api/dashboard-stats', isAdmin, (req, res) => {
 
-  res.json({
-    status: 'ok',
-    message: 'Server is running successfully',
+  const jobsQuery =
+    'SELECT COUNT(*) AS totalJobs FROM jobs';
+
+  const applicationsQuery =
+    'SELECT COUNT(*) AS totalApplications FROM applications';
+
+  db.query(jobsQuery, (err, jobsResult) => {
+
+    if (err) {
+
+      console.error(err);
+
+      return res.status(500).json({
+        error: 'Jobs count failed'
+      });
+
+    }
+
+    db.query(
+      applicationsQuery,
+      (err2, applicationsResult) => {
+
+        if (err2) {
+
+          console.error(err2);
+
+          return res.status(500).json({
+            error: 'Applications count failed'
+          });
+
+        }
+
+        res.json({
+          totalJobs:
+            jobsResult[0].totalJobs,
+
+          totalApplications:
+            applicationsResult[0]
+              .totalApplications,
+
+          systemStatus: '100%'
+        });
+
+      }
+    );
+
   });
 
-});
-
-// ================= START SERVER =================
-app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
 });
