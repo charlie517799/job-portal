@@ -243,6 +243,16 @@ button:hover{
 
     <form action="/admin/add-job" method="POST">
 
+      <select
+        name="category"
+        required
+        style="width:100%;padding:15px;border:1px solid #d1d5db;border-radius:14px;margin-bottom:18px;font-size:15px;font-family:'Poppins',sans-serif;"
+      >
+        <option value="">Select Job Category</option>
+        <option value="Government">Government Job</option>
+        <option value="Corporate">Corporate Job</option>
+      </select>
+
       <input
         type="text"
         name="title"
