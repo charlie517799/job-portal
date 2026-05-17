@@ -307,36 +307,38 @@ async function loadDashboardStats() {
 
   try {
 
-    const response =
-      await fetch('/api/dashboard-stats');
+    const response = await fetch(
+      '/api/dashboard-stats',
+      {
+        method: 'GET',
+        credentials: 'same-origin'
+      }
+    );
 
-    const data =
-      await response.json();
+    if (!response.ok) {
+      throw new Error('API failed');
+    }
 
-    document.getElementById(
-      'totalJobs'
-    ).innerText =
-      data.totalJobs + '+';
+    const data = await response.json();
 
-    document.getElementById(
-      'totalApplications'
-    ).innerText =
-      data.totalApplications + '+';
+    document.getElementById('totalJobs').innerHTML =
+      data.totalJobs;
 
-    document.getElementById(
-      'systemStatus'
-    ).innerText =
+    document.getElementById('totalApplications').innerHTML =
+      data.totalApplications;
+
+    document.getElementById('systemStatus').innerHTML =
       data.systemStatus;
 
   } catch (error) {
 
-    console.log(error);
+    console.log('Dashboard Error:', error);
 
   }
 
 }
 
-loadDashboardStats();
+window.onload = loadDashboardStats;
 
 </script>
 </body>
