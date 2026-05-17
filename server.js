@@ -39,11 +39,13 @@ const storage = new CloudinaryStorage({
   cloudinary,
   params: async (req, file) => ({
     folder: 'job-portal',
+
     resource_type:
       file.mimetype === 'application/pdf' ||
       file.originalname.toLowerCase().endsWith('.pdf')
         ? 'raw'
         : 'image',
+
     use_filename: true,
     unique_filename: true,
   }),
@@ -58,46 +60,75 @@ const db = mysql.createConnection({
   password: process.env.DB_PASSWORD,
   database: process.env.DB_NAME,
   port: process.env.DB_PORT || 3306,
+
   ssl: {
     rejectUnauthorized: false,
   },
 });
 
 db.connect((err) => {
+
   if (err) {
-    console.error('Database connection failed:', err);
+
+    console.error(
+      'Database connection failed:',
+      err
+    );
+
   } else {
-    console.log('MySQL Connected Successfully');
+
+    console.log(
+      'MySQL Connected Successfully'
+    );
+
   }
+
 });
 
 // ================= ADMIN MIDDLEWARE =================
 function isAdmin(req, res, next) {
+
   if (req.session.admin) {
     return next();
   }
 
   return res.redirect('/admin-login.html');
+
 }
 
 // ================= HOME =================
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+
+  res.sendFile(
+    path.join(__dirname, 'public', 'index.html')
+  );
+
 });
 
 // ================= ADMIN LOGIN =================
 app.post('/admin/login', (req, res) => {
+
   const { username, password } = req.body;
 
-  const adminUsername = process.env.ADMIN_USERNAME || 'admin';
-  const adminPassword = process.env.ADMIN_PASSWORD || 'admin123';
+  const adminUsername =
+    process.env.ADMIN_USERNAME || 'admin';
 
-  if (username === adminUsername && password === adminPassword) {
+  const adminPassword =
+    process.env.ADMIN_PASSWORD || 'admin123';
+
+  if (
+    username === adminUsername &&
+    password === adminPassword
+  ) {
+
     req.session.admin = true;
 
     return req.session.save(() => {
+
       res.redirect('/admin-dashboard.html');
+
     });
+
   }
 
   res.send(`
@@ -106,13 +137,18 @@ app.post('/admin/login', (req, res) => {
       window.location.href='/admin-login.html';
     </script>
   `);
+
 });
 
 // ================= ADMIN LOGOUT =================
 app.get('/admin/logout', (req, res) => {
+
   req.session.destroy(() => {
+
     res.redirect('/admin-login.html');
+
   });
+
 });
 
 // ================= ADD JOB =================
@@ -133,12 +169,25 @@ app.post('/admin/add-job', isAdmin, (req, res) => {
 
   db.query(
     sql,
-    [title, company, location, description],
+    [
+      title,
+      company,
+      location,
+      description
+    ],
     (err) => {
 
       if (err) {
-        console.error('Error adding job:', err);
-        return res.status(500).send('Error adding job');
+
+        console.error(
+          'Error adding job:',
+          err
+        );
+
+        return res
+          .status(500)
+          .send('Error adding job');
+
       }
 
       res.send(`
@@ -154,55 +203,88 @@ app.post('/admin/add-job', isAdmin, (req, res) => {
 });
 
 // ================= DELETE JOB =================
-app.get('/admin/delete-job/:id', isAdmin, (req, res) => {
+app.get(
+  '/admin/delete-job/:id',
+  isAdmin,
+  (req, res) => {
 
-  const jobId = req.params.id;
+    const jobId = req.params.id;
 
-  db.query(
-    'DELETE FROM applications WHERE job_id = ?',
-    [jobId],
-    (err) => {
+    db.query(
+      'DELETE FROM applications WHERE job_id = ?',
+      [jobId],
+      (err) => {
 
-      if (err) {
-        console.error('Error deleting applications:', err);
-        return res.status(500).send('Error deleting applications');
-      }
+        if (err) {
 
-      db.query(
-        'DELETE FROM jobs WHERE id = ?',
-        [jobId],
-        (err2) => {
+          console.error(
+            'Error deleting applications:',
+            err
+          );
 
-          if (err2) {
-            console.error('Error deleting job:', err2);
-            return res.status(500).send('Error deleting job');
-          }
-
-          res.send(`
-            <script>
-              alert('Job Deleted Successfully');
-              window.location.href='/admin-dashboard.html';
-            </script>
-          `);
+          return res
+            .status(500)
+            .send(
+              'Error deleting applications'
+            );
 
         }
-      );
 
-    }
-  );
+        db.query(
+          'DELETE FROM jobs WHERE id = ?',
+          [jobId],
+          (err2) => {
 
-});
+            if (err2) {
+
+              console.error(
+                'Error deleting job:',
+                err2
+              );
+
+              return res
+                .status(500)
+                .send(
+                  'Error deleting job'
+                );
+
+            }
+
+            res.send(`
+              <script>
+                alert('Job Deleted Successfully');
+                window.location.href='/admin-dashboard.html';
+              </script>
+            `);
+
+          }
+        );
+
+      }
+    );
+
+  }
+);
 
 // ================= GET JOBS =================
 app.get('/api/jobs', (req, res) => {
 
   db.query(
     'SELECT * FROM jobs ORDER BY created_at DESC',
+
     (err, results) => {
 
       if (err) {
-        console.error('Error fetching jobs:', err);
-        return res.status(500).json([]);
+
+        console.error(
+          'Error fetching jobs:',
+          err
+        );
+
+        return res
+          .status(500)
+          .json([]);
+
       }
 
       res.json(results);
@@ -214,6 +296,7 @@ app.get('/api/jobs', (req, res) => {
 
 // ================= APPLY JOB =================
 app.post(
+
   '/apply',
 
   upload.fields([
@@ -237,10 +320,17 @@ app.post(
       current_address,
     } = req.body;
 
-    const photo = req.files?.photo?.[0]?.path || '';
-    const aadhaar = req.files?.aadhaar?.[0]?.path || '';
-    const pan_card = req.files?.pan_card?.[0]?.path || '';
-    const resume = req.files?.resume?.[0]?.path || '';
+    const photo =
+      req.files?.photo?.[0]?.path || '';
+
+    const aadhaar =
+      req.files?.aadhaar?.[0]?.path || '';
+
+    const pan_card =
+      req.files?.pan_card?.[0]?.path || '';
+
+    const resume =
+      req.files?.resume?.[0]?.path || '';
 
     const sql = `
       INSERT INTO applications (
@@ -280,7 +370,11 @@ app.post(
     db.query(sql, values, (err) => {
 
       if (err) {
-        console.error('Error submitting application:', err);
+
+        console.error(
+          'Error submitting application:',
+          err
+        );
 
         return res.status(500).send(`
           <script>
@@ -288,12 +382,13 @@ app.post(
             window.history.back();
           </script>
         `);
+
       }
 
       res.send(`
         <script>
           alert('Application Submitted Successfully');
-          window.location.href = '/';
+          window.location.href='/';
         </script>
       `);
 
@@ -303,108 +398,174 @@ app.post(
 );
 
 // ================= GET APPLICATIONS =================
-app.get('/api/applications', isAdmin, (req, res) => {
+app.get(
+  '/api/applications',
+  isAdmin,
+  (req, res) => {
 
-  const sql = `
-    SELECT
-      applications.*,
-      jobs.title AS job_title
-    FROM applications
-    LEFT JOIN jobs
+    const sql = `
+      SELECT
+        applications.*,
+        jobs.title AS job_title
+      FROM applications
+      LEFT JOIN jobs
       ON applications.job_id = jobs.id
-    ORDER BY applications.id DESC
-  `;
+      ORDER BY applications.id DESC
+    `;
 
-  db.query(sql, (err, results) => {
+    db.query(sql, (err, results) => {
 
-    if (err) {
-      console.error('Error fetching applications:', err);
-      return res.status(500).json([]);
-    }
+      if (err) {
 
-    res.json(results);
+        console.error(
+          'Error fetching applications:',
+          err
+        );
 
-  });
+        return res
+          .status(500)
+          .json([]);
 
-});
+      }
 
-// ================= DELETE APPLICATION =================
-app.delete('/api/applications/:id', isAdmin, (req, res) => {
+      res.json(results);
 
-  const applicationId = req.params.id;
-
-  const sql = 'DELETE FROM applications WHERE id = ?';
-
-  db.query(sql, [applicationId], (err) => {
-
-    if (err) {
-
-      console.error('Error deleting application:', err);
-
-      return res.status(500).json({
-        message: 'Delete failed'
-      });
-
-    }
-
-    res.json({
-      message: 'Application deleted successfully'
     });
 
-  });
+  }
+);
 
-});
+// ================= DELETE APPLICATION =================
+app.delete(
+  '/api/applications/:id',
+  isAdmin,
+  (req, res) => {
 
-// ================= HEALTH CHECK =================
-// ================= DASHBOARD STATS =================
-app.get('/api/dashboard-stats', isAdmin, (req, res) => {
+    const applicationId =
+      req.params.id;
 
-  const jobsQuery =
-    'SELECT COUNT(*) AS totalJobs FROM jobs';
-
-  const applicationsQuery =
-    'SELECT COUNT(*) AS totalApplications FROM applications';
-
-  db.query(jobsQuery, (err, jobsResult) => {
-
-    if (err) {
-
-      console.error(err);
-
-      return res.status(500).json({
-        error: 'Jobs count failed'
-      });
-
-    }
+    const sql =
+      'DELETE FROM applications WHERE id = ?';
 
     db.query(
-      applicationsQuery,
-      (err2, applicationsResult) => {
+      sql,
+      [applicationId],
+      (err) => {
 
-        if (err2) {
+        if (err) {
 
-          console.error(err2);
+          console.error(
+            'Error deleting application:',
+            err
+          );
 
-          return res.status(500).json({
-            error: 'Applications count failed'
-          });
+          return res
+            .status(500)
+            .json({
+              message: 'Delete failed'
+            });
 
         }
 
         res.json({
-          totalJobs:
-            jobsResult[0].totalJobs,
-
-          totalApplications:
-            applicationsResult[0]
-              .totalApplications,
-
-          systemStatus: '100%'
+          message:
+            'Application deleted successfully'
         });
 
       }
     );
 
+  }
+);
+
+// ================= DASHBOARD STATS =================
+app.get(
+  '/api/dashboard-stats',
+  isAdmin,
+  (req, res) => {
+
+    const jobsQuery =
+      'SELECT COUNT(*) AS totalJobs FROM jobs';
+
+    const applicationsQuery =
+      'SELECT COUNT(*) AS totalApplications FROM applications';
+
+    db.query(
+      jobsQuery,
+      (err, jobsResult) => {
+
+        if (err) {
+
+          console.error(err);
+
+          return res
+            .status(500)
+            .json({
+              error:
+                'Jobs count failed'
+            });
+
+        }
+
+        db.query(
+          applicationsQuery,
+          (
+            err2,
+            applicationsResult
+          ) => {
+
+            if (err2) {
+
+              console.error(err2);
+
+              return res
+                .status(500)
+                .json({
+                  error:
+                    'Applications count failed'
+                });
+
+            }
+
+            res.json({
+
+              totalJobs:
+                jobsResult[0]
+                  .totalJobs,
+
+              totalApplications:
+                applicationsResult[0]
+                  .totalApplications,
+
+              systemStatus: '100%'
+
+            });
+
+          }
+        );
+
+      }
+    );
+
+  }
+);
+
+// ================= HEALTH CHECK =================
+app.get('/health', (req, res) => {
+
+  res.json({
+    status: 'ok',
+    message:
+      'Server is running successfully',
   });
+
+});
+
+// ================= START SERVER =================
+app.listen(PORT, () => {
+
+  console.log(
+    `Server running on http://localhost:${PORT}`
+  );
 
 });
