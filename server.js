@@ -19,8 +19,12 @@ app.use(express.json());
 
 app.use(
   session({
-    secret: process.env.SESSION_SECRET || 'jobportal_secret_key',
+    secret:
+      process.env.SESSION_SECRET ||
+      'jobportal_secret_key',
+
     resave: false,
+
     saveUninitialized: false,
 
     cookie: {
@@ -59,15 +63,11 @@ const storage = new CloudinaryStorage({
     folder: 'job-portal',
 
     resource_type:
-
       file.mimetype === 'application/pdf' ||
-
       file.originalname
         .toLowerCase()
         .endsWith('.pdf')
-
         ? 'raw'
-
         : 'image',
 
     use_filename: true,
@@ -231,6 +231,13 @@ app.post(
 
     } = req.body;
 
+    console.log('JOB DATA:', req.body);
+
+    // CATEGORY DEFAULT FIX
+
+    const jobCategory =
+      category || 'Government';
+
     const sql = `
 
       INSERT INTO jobs
@@ -251,27 +258,40 @@ app.post(
       sql,
 
       [
-        category,
+        jobCategory,
         title,
         company,
         location,
         description
       ],
 
-      (err) => {
+      (err, result) => {
 
         if (err) {
 
           console.error(
-            'Error adding job:',
+            'FULL ERROR:',
             err
           );
 
-          return res
-            .status(500)
-            .send('Error adding job');
+          return res.status(500).send(`
+
+            <script>
+
+              alert('Error adding job');
+
+              window.history.back();
+
+            </script>
+
+          `);
 
         }
+
+        console.log(
+          'JOB ADDED:',
+          result
+        );
 
         res.send(`
 
@@ -307,7 +327,7 @@ app.get(
 
         if (err) {
 
-          console.log(err);
+          console.error(err);
 
           return res
             .status(500)
@@ -343,10 +363,7 @@ app.get(
 
         if (err) {
 
-          console.error(
-            'Error deleting applications:',
-            err
-          );
+          console.error(err);
 
           return res
             .status(500)
@@ -366,10 +383,7 @@ app.get(
 
             if (err2) {
 
-              console.error(
-                'Error deleting job:',
-                err2
-              );
+              console.error(err2);
 
               return res
                 .status(500)
@@ -402,7 +416,7 @@ app.get(
   }
 );
 
-// ================= GET ALL JOBS =================
+// ================= ALL JOBS =================
 
 app.get('/api/jobs', (req, res) => {
 
@@ -414,10 +428,7 @@ app.get('/api/jobs', (req, res) => {
 
       if (err) {
 
-        console.error(
-          'Error fetching jobs:',
-          err
-        );
+        console.error(err);
 
         return res
           .status(500)
@@ -611,10 +622,7 @@ app.post(
 
         if (err) {
 
-          console.error(
-            'Error submitting application:',
-            err
-          );
+          console.error(err);
 
           return res.status(500).send(`
 
@@ -649,7 +657,7 @@ app.post(
   }
 );
 
-// ================= GET APPLICATIONS =================
+// ================= APPLICATIONS =================
 
 app.get(
   '/api/applications',
@@ -678,10 +686,7 @@ app.get(
 
       if (err) {
 
-        console.error(
-          'Error fetching applications:',
-          err
-        );
+        console.error(err);
 
         return res
           .status(500)
@@ -706,12 +711,9 @@ app.delete(
     const applicationId =
       req.params.id;
 
-    const sql =
-      'DELETE FROM applications WHERE id = ?';
-
     db.query(
 
-      sql,
+      'DELETE FROM applications WHERE id = ?',
 
       [applicationId],
 
@@ -719,10 +721,7 @@ app.delete(
 
         if (err) {
 
-          console.error(
-            'Error deleting application:',
-            err
-          );
+          console.error(err);
 
           return res
             .status(500)
