@@ -1,282 +1,154 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Admin Dashboard</title>
 
 <style>
-body {
-  margin: 0;
-  padding: 30px;
-  font-family: Arial, sans-serif;
-  background: #f1f5f9;
+body{
+  margin:0;
+  font-family:Segoe UI;
+  background:#f4f7fb;
 }
 
-h1 {
-  text-align: center;
-  color: #1e293b;
-  margin-bottom: 30px;
+.container{
+  max-width:1400px;
+  margin:30px auto;
+  background:white;
+  padding:30px;
+  border-radius:20px;
+  box-shadow:0 10px 30px rgba(0,0,0,0.08);
 }
 
-.box {
-  max-width: 900px;
-  margin: auto;
-  background: white;
-  padding: 30px;
-  border-radius: 16px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+h1{
+  text-align:center;
+  color:#14213d;
 }
 
-.top-buttons {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
-  margin-bottom: 30px;
+.top-buttons{
+  display:flex;
+  gap:15px;
+  margin-bottom:25px;
 }
 
-.top-buttons a {
-  display: inline-block;
-  padding: 12px 20px;
-  background: #2563eb;
-  color: white;
-  text-decoration: none;
-  border-radius: 10px;
-  font-weight: 600;
-  transition: 0.3s;
+.btn{
+  padding:14px 24px;
+  border:none;
+  border-radius:12px;
+  color:white;
+  cursor:pointer;
+  font-weight:700;
 }
 
-.top-buttons a:hover {
-  background: #1d4ed8;
+.blue{background:#2563eb;}
+.red{background:#ef4444;}
+.green{background:#16a34a;}
+
+input,select,textarea{
+  width:100%;
+  padding:14px;
+  margin:8px 0;
+  border:1px solid #ddd;
+  border-radius:10px;
 }
 
-.top-buttons a.logout {
-  background: #dc2626;
+table{
+  width:100%;
+  border-collapse:collapse;
+  margin-top:20px;
 }
 
-.top-buttons a.logout:hover {
-  background: #b91c1c;
+th,td{
+  padding:14px;
+  border-bottom:1px solid #eee;
+  text-align:left;
 }
 
-input,
-textarea,
-select {
-  width: 100%;
-  padding: 12px;
-  margin-top: 12px;
-  border: 1px solid #cbd5e1;
-  border-radius: 8px;
-  font-size: 16px;
-  box-sizing: border-box;
+th{
+  background:#2563eb;
+  color:white;
 }
 
-button {
-  width: 100%;
-  padding: 14px;
-  margin-top: 15px;
-  border: none;
-  background: #2563eb;
-  color: white;
-  font-size: 18px;
-  border-radius: 8px;
-  cursor: pointer;
-  font-weight: 600;
-}
-
-button:hover {
-  background: #1d4ed8;
-}
-
-hr {
-  margin: 40px 0;
-  border: none;
-  border-top: 1px solid #e2e8f0;
-}
-
-h2 {
-  color: #1e293b;
-}
-
-.job-card {
-  background: #ffffff;
-  padding: 20px;
-  border-radius: 12px;
-  margin-top: 20px;
-  border-left: 5px solid #2563eb;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-}
-
-.job-card h3 {
-  margin-top: 0;
-  color: #1e293b;
-}
-
-.job-card p {
-  margin: 8px 0;
-  color: #334155;
-}
-
-.delete-btn {
-  display: inline-block;
-  margin-top: 12px;
-  background: #dc2626;
-  color: white;
-  padding: 10px 15px;
-  border-radius: 8px;
-  text-decoration: none;
-  font-weight: 600;
-}
-
-.delete-btn:hover {
-  background: #b91c1c;
-}
-
-.empty {
-  text-align: center;
-  padding: 30px;
-  background: #f8fafc;
-  border-radius: 10px;
-  color: #64748b;
+img{
+  width:60px;
+  border-radius:10px;
 }
 </style>
 </head>
-
 <body>
 
-<div class="box">
+<div class="container">
 
-  <h1>🚀 Admin Dashboard</h1>
+<h1>🚀 Admin Dashboard</h1>
 
-  <!-- Top Navigation Buttons -->
-  <div class="top-buttons">
-    <a href="/applications.html">📋 All Applications</a>
-    <a href="/admin/logout" class="logout">🚪 Logout</a>
-  </div>
+<div class="top-buttons">
+<a href="#applications"><button class="btn blue">📄 All Applications</button></a>
+<a href="/admin/logout"><button class="btn red">Logout</button></a>
+</div>
 
-  <!-- Add Job Form -->
-  <form action="/admin/add-job" method="POST">
+<h2>Post New Job</h2>
 
-    <select name="category" required>
-      <option value="">Select Category</option>
-      <option value="Government">Government</option>
-      <option value="Corporate">Corporate</option>
-    </select>
+<form action="/admin/add-job" method="POST">
+<select name="category" required>
+<option value="Government">Government</option>
+<option value="Corporate">Corporate</option>
+</select>
 
-    <input
-      type="text"
-      name="title"
-      placeholder="Job Title"
-      required
-    />
+<input type="text" name="title" placeholder="Job Title" required>
+<input type="text" name="company" placeholder="Company Name" required>
+<input type="text" name="location" placeholder="Location" required>
+<input type="text" name="salary" placeholder="Salary">
+<textarea name="description" placeholder="Description"></textarea>
+<input type="text" name="apply_link" placeholder="Apply Link">
 
-    <input
-      type="text"
-      name="company"
-      placeholder="Company Name"
-      required
-    />
+<button class="btn green" type="submit">Post Job</button>
+</form>
 
-    <input
-      type="text"
-      name="location"
-      placeholder="Location"
-      required
-    />
+<h2 id="applications">All Applications</h2>
 
-    <input
-      type="text"
-      name="salary"
-      placeholder="Salary"
-    />
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Mobile</th>
+<th>Age</th>
+<th>Gender</th>
+<th>Marital</th>
+<th>Photo</th>
+<th>Permanent Address</th>
+<th>Current Address</th>
+<th>Resume</th>
+</tr>
+</thead>
 
-    <textarea
-      name="description"
-      placeholder="Job Description"
-      rows="5"
-      required
-    ></textarea>
-
-    <input
-      type="text"
-      name="apply_link"
-      placeholder="Apply Link (Optional)"
-    />
-
-    <button type="submit">📢 Post Job</button>
-
-  </form>
-
-  <hr />
-
-  <!-- Posted Jobs -->
-  <h2>📌 Posted Jobs</h2>
-
-  <div id="jobs">
-    <div class="empty">Loading jobs...</div>
-  </div>
+<tbody id="applicationsTable"></tbody>
+</table>
 
 </div>
 
 <script>
-async function loadJobs() {
-  try {
-    const response = await fetch('/api/admin/jobs');
+fetch('/api/applications')
+.then(res=>res.json())
+.then(data=>{
+const table=document.getElementById('applicationsTable');
 
-    // If not logged in, redirect to login page
-    if (response.redirected) {
-      window.location.href = response.url;
-      return;
-    }
-
-    const jobs = await response.json();
-
-    const jobsDiv = document.getElementById('jobs');
-    jobsDiv.innerHTML = '';
-
-    if (!jobs.length) {
-      jobsDiv.innerHTML =
-        '<div class="empty">No jobs posted yet.</div>';
-      return;
-    }
-
-    jobs.forEach(job => {
-      jobsDiv.innerHTML += `
-        <div class="job-card">
-          <h3>${job.title}</h3>
-
-          <p><b>Company:</b> ${job.company}</p>
-          <p><b>Category:</b> ${job.category || ''}</p>
-          <p><b>Location:</b> ${job.location}</p>
-          <p><b>Salary:</b> ${job.salary || 'Not specified'}</p>
-
-          ${
-            job.apply_link
-              ? `<p><b>Apply Link:</b>
-                   <a href="${job.apply_link}" target="_blank">
-                     Open Link
-                   </a>
-                 </p>`
-              : ''
-          }
-
-          <a
-            class="delete-btn"
-            href="/admin/delete-job/${job.id}"
-            onclick="return confirm('Delete this job?')"
-          >
-            🗑 Delete Job
-          </a>
-        </div>
-      `;
-    });
-  } catch (error) {
-    console.error('Error loading jobs:', error);
-    document.getElementById('jobs').innerHTML =
-      '<div class="empty">Unable to load jobs.</div>';
-  }
-}
-
-loadJobs();
+data.forEach(app=>{
+table.innerHTML+=`
+<tr>
+<td>${app.full_name}</td>
+<td>${app.mobile}</td>
+<td>${app.age}</td>
+<td>${app.gender}</td>
+<td>${app.marital_status}</td>
+<td><img src="${app.photo}" /></td>
+<td>${app.permanent_address}</td>
+<td>${app.current_address}</td>
+<td><a href="${app.resume}" target="_blank">View Resume</a></td>
+</tr>
+`;
+});
+});
 </script>
 
 </body>
