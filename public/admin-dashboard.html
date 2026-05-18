@@ -8,20 +8,20 @@
 <style>
 body{
   margin:0;
-  font-family:Segoe UI;
+  font-family:Segoe UI,sans-serif;
   background:#f4f7fb;
 }
 
 .container{
-  max-width:1400px;
+  max-width:1500px;
   margin:30px auto;
-  background:white;
+  background:#fff;
   padding:30px;
   border-radius:20px;
   box-shadow:0 10px 30px rgba(0,0,0,0.08);
 }
 
-h1{
+h1,h2{
   text-align:center;
   color:#14213d;
 }
@@ -51,16 +51,18 @@ input,select,textarea{
   margin:8px 0;
   border:1px solid #ddd;
   border-radius:10px;
+  font-size:16px;
 }
 
 table{
   width:100%;
   border-collapse:collapse;
   margin-top:20px;
+  font-size:14px;
 }
 
 th,td{
-  padding:14px;
+  padding:12px;
   border-bottom:1px solid #eee;
   text-align:left;
 }
@@ -71,8 +73,23 @@ th{
 }
 
 img{
-  width:60px;
+  width:70px;
   border-radius:10px;
+}
+
+a{
+  color:#2563eb;
+  text-decoration:none;
+  font-weight:600;
+}
+
+.delete-btn{
+  background:#ef4444;
+  color:white;
+  padding:8px 14px;
+  border:none;
+  border-radius:8px;
+  cursor:pointer;
 }
 </style>
 </head>
@@ -99,7 +116,7 @@ img{
 <input type="text" name="company" placeholder="Company Name" required>
 <input type="text" name="location" placeholder="Location" required>
 <input type="text" name="salary" placeholder="Salary">
-<textarea name="description" placeholder="Description"></textarea>
+<textarea name="description" placeholder="Job Description"></textarea>
 <input type="text" name="apply_link" placeholder="Apply Link">
 
 <button class="btn green" type="submit">Post Job</button>
@@ -116,9 +133,12 @@ img{
 <th>Gender</th>
 <th>Marital</th>
 <th>Photo</th>
+<th>Aadhaar</th>
+<th>PAN</th>
 <th>Permanent Address</th>
 <th>Current Address</th>
 <th>Resume</th>
+<th>Action</th>
 </tr>
 </thead>
 
@@ -129,26 +149,54 @@ img{
 
 <script>
 fetch('/api/applications')
-.then(res=>res.json())
-.then(data=>{
-const table=document.getElementById('applicationsTable');
+.then(res => res.json())
+.then(data => {
+const table = document.getElementById('applicationsTable');
 
-data.forEach(app=>{
-table.innerHTML+=`
+data.forEach(app => {
+table.innerHTML += `
 <tr>
-<td>${app.full_name}</td>
-<td>${app.mobile}</td>
-<td>${app.age}</td>
-<td>${app.gender}</td>
-<td>${app.marital_status}</td>
-<td><img src="${app.photo}" /></td>
-<td>${app.permanent_address}</td>
-<td>${app.current_address}</td>
-<td><a href="${app.resume}" target="_blank">View Resume</a></td>
+<td>${app.full_name || ''}</td>
+<td>${app.mobile || ''}</td>
+<td>${app.age || ''}</td>
+<td>${app.gender || ''}</td>
+<td>${app.marital_status || ''}</td>
+
+<td>
+${app.photo ? `<img src="${app.photo}">` : 'No Photo'}
+</td>
+
+<td>
+${app.aadhaar ? `<a href="${app.aadhaar}" target="_blank">View Aadhaar</a>` : 'No File'}
+</td>
+
+<td>
+${app.pan_card ? `<a href="${app.pan_card}" target="_blank">View PAN</a>` : 'No File'}
+</td>
+
+<td>${app.permanent_address || ''}</td>
+<td>${app.current_address || ''}</td>
+
+<td>
+${app.resume ? `<a href="${app.resume}" target="_blank">View Resume</a>` : 'No Resume'}
+</td>
+
+<td>
+<button class="delete-btn" onclick="deleteApplication(${app.id})">Delete</button>
+</td>
 </tr>
 `;
 });
 });
+
+function deleteApplication(id){
+if(confirm('Delete this application?')){
+fetch('/api/applications/' + id,{
+method:'DELETE'
+})
+.then(()=>location.reload());
+}
+}
 </script>
 
 </body>
