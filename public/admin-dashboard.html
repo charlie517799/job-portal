@@ -3,115 +3,79 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>All Applications</title>
-
+<title>Admin Dashboard</title>
 <style>
-body{
-margin:0;
-font-family:Segoe UI;
-background:#f4f7fb;
-padding:30px;
-}
-
-.container{
-max-width:1600px;
-margin:auto;
-background:white;
-padding:30px;
-border-radius:20px;
-box-shadow:0 10px 30px rgba(0,0,0,0.08);
-}
-
-h1{
-text-align:center;
-color:#14213d;
-}
-
-table{
-width:100%;
-border-collapse:collapse;
-margin-top:20px;
-}
-
-th,td{
-padding:12px;
-border-bottom:1px solid #eee;
-}
-
-th{
-background:#2563eb;
-color:white;
-}
-
-img{
-width:70px;
-border-radius:10px;
-}
-
-a{
-color:#2563eb;
-font-weight:700;
-text-decoration:none;
-}
-
-.back{
-display:inline-block;
-margin-bottom:20px;
-padding:12px 20px;
-background:#2563eb;
-color:white;
-border-radius:10px;
-text-decoration:none;
-}
+body{margin:0;font-family:Segoe UI;background:#f4f7fb;padding:30px}
+.container{max-width:1400px;margin:auto;background:#fff;padding:30px;border-radius:20px}
+h1,h2{text-align:center}
+.btn{padding:12px 20px;border:none;border-radius:10px;color:#fff;cursor:pointer}
+.blue{background:#2563eb}.red{background:#ef4444}.green{background:#16a34a}
+input,select,textarea{width:100%;padding:14px;margin:8px 0;border:1px solid #ddd;border-radius:10px}
+table{width:100%;border-collapse:collapse;margin-top:20px}
+th,td{padding:12px;border-bottom:1px solid #eee}
+th{background:#2563eb;color:white}
 </style>
 </head>
 <body>
-
 <div class="container">
 
-<a href="/admin-dashboard.html" class="back">← Back</a>
+<h1>🚀 Admin Dashboard</h1>
 
-<h1>All Applications</h1>
+<a href="/applications.html"><button class="btn blue">All Applications</button></a>
+<a href="/admin/logout"><button class="btn red">Logout</button></a>
+
+<h2>Post Job</h2>
+
+<form action="/admin/add-job" method="POST">
+<select name="category">
+<option>Government</option>
+<option>Corporate</option>
+</select>
+
+<input type="text" name="title" placeholder="Job Title" required>
+<input type="text" name="company" placeholder="Company" required>
+<input type="text" name="location" placeholder="Location" required>
+<input type="text" name="salary" placeholder="Salary">
+<textarea name="description" placeholder="Description"></textarea>
+
+<button class="btn green" type="submit">Post Job</button>
+</form>
+
+<h2>All Posted Jobs</h2>
 
 <table>
 <thead>
 <tr>
-<th>Name</th>
-<th>Mobile</th>
-<th>Photo</th>
-<th>Aadhaar</th>
-<th>PAN</th>
-<th>Address</th>
-<th>Resume</th>
+<th>ID</th>
+<th>Category</th>
+<th>Title</th>
+<th>Company</th>
+<th>Location</th>
+<th>Delete</th>
 </tr>
 </thead>
-
-<tbody id="applicationsTable"></tbody>
+<tbody id="jobsTable"></tbody>
 </table>
 
 </div>
 
 <script>
-fetch('/api/applications')
+fetch('/api/admin/jobs')
 .then(res=>res.json())
 .then(data=>{
-const table=document.getElementById('applicationsTable');
-
-data.forEach(app=>{
+const table=document.getElementById('jobsTable');
+data.forEach(job=>{
 table.innerHTML+=`
 <tr>
-<td>${app.full_name}</td>
-<td>${app.mobile}</td>
-<td><img src="${app.photo}"></td>
-<td><a href="${app.aadhaar}" target="_blank">View</a></td>
-<td><a href="${app.pan_card}" target="_blank">View</a></td>
-<td>${app.permanent_address}</td>
-<td><a href="${app.resume}" target="_blank">Resume</a></td>
-</tr>
-`;
+<td>${job.id}</td>
+<td>${job.category}</td>
+<td>${job.title}</td>
+<td>${job.company}</td>
+<td>${job.location}</td>
+<td><a href="/admin/delete-job/${job.id}"><button class="btn red">Delete</button></a></td>
+</tr>`;
 });
 });
 </script>
-
 </body>
 </html>
