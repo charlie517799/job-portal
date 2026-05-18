@@ -1,6 +1,3 @@
-
-
-```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -10,9 +7,11 @@
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
 <style>
+
 *{
   margin:0;
   padding:0;
@@ -114,6 +113,7 @@ body{
   padding:35px;
   border-radius:22px;
   box-shadow:0 10px 30px rgba(0,0,0,0.07);
+  margin-bottom:30px;
 }
 
 .form-box h2{
@@ -121,7 +121,8 @@ body{
 }
 
 input,
-textarea{
+textarea,
+select{
   width:100%;
   padding:15px;
   border:1px solid #d1d5db;
@@ -176,6 +177,34 @@ button:hover{
   color:white;
 }
 
+.job-card{
+  border:1px solid #e5e7eb;
+  border-radius:16px;
+  padding:20px;
+  margin-bottom:15px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:20px;
+  flex-wrap:wrap;
+}
+
+.job-card h3{
+  margin-bottom:8px;
+}
+
+.job-card p{
+  margin-bottom:5px;
+}
+
+.delete-btn{
+  background:#dc2626;
+}
+
+.delete-btn:hover{
+  background:#b91c1c;
+}
+
 @media(max-width:900px){
 
   .sidebar{
@@ -194,28 +223,47 @@ button:hover{
   }
 
 }
+
 </style>
 </head>
 <body>
 
 <div class="sidebar">
-  <div class="logo">Opportunity Hub</div>
+
+  <div class="logo">
+    Opportunity Hub
+  </div>
 
   <div class="menu">
-    <a href="/">🏠 Home</a>
-    <a href="/applications.html">📋 Applications</a>
-    <a href="/admin/logout">🚪 Logout</a>
+
+    <a href="/">
+      🏠 Home
+    </a>
+
+    <a href="/applications.html">
+      📋 Applications
+    </a>
+
+    <a href="/admin/logout">
+      🚪 Logout
+    </a>
+
   </div>
+
 </div>
 
 <div class="main">
 
   <div class="topbar">
-    <h1>Admin Dashboard</h1>
+
+    <h1>
+      Admin Dashboard
+    </h1>
 
     <a href="/admin/logout" class="logout-btn">
       Logout
     </a>
+
   </div>
 
   <div class="stats">
@@ -231,11 +279,13 @@ button:hover{
     </div>
 
     <div class="card">
-      <h2 id="systemStatus">0%</h2>
+      <h2 id="systemStatus">100%</h2>
       <p>System Working</p>
     </div>
 
   </div>
+
+  <!-- POST JOB -->
 
   <div class="form-box">
 
@@ -246,11 +296,20 @@ button:hover{
       <select
         name="category"
         required
-        style="width:100%;padding:15px;border:1px solid #d1d5db;border-radius:14px;margin-bottom:18px;font-size:15px;font-family:'Poppins',sans-serif;"
       >
-        <option value="">Select Job Category</option>
-        <option value="Government">Government Job</option>
-        <option value="Corporate">Corporate Job</option>
+
+        <option value="">
+          Select Job Category
+        </option>
+
+        <option value="Government">
+          Government Job
+        </option>
+
+        <option value="Corporate">
+          Corporate Job
+        </option>
+
       </select>
 
       <input
@@ -288,6 +347,18 @@ button:hover{
 
   </div>
 
+  <!-- MANAGE JOBS -->
+
+  <div class="form-box">
+
+    <h2>Manage Jobs</h2>
+
+    <div id="jobsList"></div>
+
+  </div>
+
+  <!-- QUICK LINKS -->
+
   <div class="quick-links">
 
     <a href="/applications.html">
@@ -301,7 +372,10 @@ button:hover{
   </div>
 
 </div>
+
 <script>
+
+// ================= DASHBOARD STATS =================
 
 async function loadDashboardStats() {
 
@@ -314,10 +388,6 @@ async function loadDashboardStats() {
         credentials: 'same-origin'
       }
     );
-
-    if (!response.ok) {
-      throw new Error('API failed');
-    }
 
     const data = await response.json();
 
@@ -332,14 +402,112 @@ async function loadDashboardStats() {
 
   } catch (error) {
 
-    console.log('Dashboard Error:', error);
+    console.log(error);
 
   }
 
 }
 
-window.onload = loadDashboardStats;
+// ================= LOAD JOBS =================
+
+async function loadJobs() {
+
+  try {
+
+    const response =
+      await fetch('/api/admin/jobs');
+
+    const jobs =
+      await response.json();
+
+    const jobsList =
+      document.getElementById('jobsList');
+
+    jobsList.innerHTML = '';
+
+    jobs.forEach(job => {
+
+      jobsList.innerHTML += `
+
+        <div class="job-card">
+
+          <div>
+
+            <h3>
+              ${job.title}
+            </h3>
+
+            <p>
+              ${job.company}
+            </p>
+
+            <small>
+              ${job.location}
+            </small>
+
+          </div>
+
+          <button
+            class="delete-btn"
+            onclick="deleteJob(${job.id})"
+          >
+            Delete
+          </button>
+
+        </div>
+
+      `;
+
+    });
+
+  } catch (error) {
+
+    console.log(error);
+
+  }
+
+}
+
+// ================= DELETE JOB =================
+
+async function deleteJob(id) {
+
+  const confirmDelete =
+    confirm('Delete this job?');
+
+  if (!confirmDelete) return;
+
+  try {
+
+    await fetch(
+      '/admin/delete-job/' + id
+    );
+
+    alert('Job Deleted Successfully');
+
+    loadJobs();
+
+    loadDashboardStats();
+
+  } catch (error) {
+
+    console.log(error);
+
+  }
+
+}
+
+// ================= WINDOW LOAD =================
+
+window.onload = () => {
+
+  loadDashboardStats();
+
+  loadJobs();
+
+};
 
 </script>
+
 </body>
 </html>

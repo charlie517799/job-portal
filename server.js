@@ -155,6 +155,7 @@ app.get('/admin/logout', (req, res) => {
 app.post('/admin/add-job', isAdmin, (req, res) => {
 
   const {
+    category,
     title,
     company,
     location,
@@ -163,13 +164,14 @@ app.post('/admin/add-job', isAdmin, (req, res) => {
 
   const sql = `
     INSERT INTO jobs
-    (title, company, location, description)
-    VALUES (?, ?, ?, ?)
+    (category, title, company, location, description)
+    VALUES (?, ?, ?, ?, ?)
   `;
 
   db.query(
     sql,
     [
+      category,
       title,
       company,
       location,
@@ -201,6 +203,35 @@ app.post('/admin/add-job', isAdmin, (req, res) => {
   );
 
 });
+
+// ================= ADMIN JOBS =================
+app.get(
+  '/api/admin/jobs',
+  isAdmin,
+  (req, res) => {
+
+    db.query(
+      'SELECT * FROM jobs ORDER BY id DESC',
+
+      (err, results) => {
+
+        if (err) {
+
+          console.log(err);
+
+          return res
+            .status(500)
+            .json([]);
+
+        }
+
+        res.json(results);
+
+      }
+    );
+
+  }
+);
 
 // ================= DELETE JOB =================
 app.get(
@@ -270,7 +301,7 @@ app.get(
 app.get('/api/jobs', (req, res) => {
 
   db.query(
-    'SELECT * FROM jobs ORDER BY created_at DESC',
+    'SELECT * FROM jobs ORDER BY id DESC',
 
     (err, results) => {
 
