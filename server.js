@@ -227,29 +227,28 @@ app.post(
       title,
       company,
       location,
-      description
+      salary,
+      description,
+      apply_link
 
     } = req.body;
 
     console.log('JOB DATA:', req.body);
 
-    // CATEGORY DEFAULT FIX
-
-    const jobCategory =
-      category || 'Government';
-
     const sql = `
 
       INSERT INTO jobs
       (
-        category,
         title,
         company,
         location,
-        description
+        salary,
+        category,
+        description,
+        apply_link
       )
 
-      VALUES (?, ?, ?, ?, ?)
+      VALUES (?, ?, ?, ?, ?, ?, ?)
 
     `;
 
@@ -258,11 +257,15 @@ app.post(
       sql,
 
       [
-        jobCategory,
-        title,
-        company,
-        location,
-        description
+
+        title || '',
+        company || '',
+        location || '',
+        salary || '',
+        category || 'Government',
+        description || '',
+        apply_link || ''
+
       ],
 
       (err, result) => {
