@@ -1,8 +1,4 @@
-# ✅ Complete Working `server.js` for Job Portal
 
-Copy this entire file and replace your existing `server.js`.
-
-```javascript
 require('dotenv').config();
 
 const express = require('express');
