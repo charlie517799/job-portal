@@ -1,315 +1,94 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Opportunity Hub Admin</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin Dashboard</title>
 
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <style>
 
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    body{
+      margin:0;
+      padding:30px;
+      font-family:Arial;
+      background:#f1f5f9;
+    }
 
-<style>
+    h1{
+      text-align:center;
+      color:#1e293b;
+    }
 
-*{
-  margin:0;
-  padding:0;
-  box-sizing:border-box;
-}
+    .box{
+      max-width:900px;
+      margin:auto;
+      background:white;
+      padding:25px;
+      border-radius:12px;
+      box-shadow:0 0 10px rgba(0,0,0,0.1);
+    }
 
-body{
-  font-family:'Poppins',sans-serif;
-  background:#f4f7fb;
-  color:#111827;
-}
+    input,
+    textarea,
+    select{
+      width:100%;
+      padding:12px;
+      margin-top:12px;
+      border:1px solid #ccc;
+      border-radius:8px;
+      font-size:16px;
+      box-sizing:border-box;
+    }
 
-.sidebar{
-  width:260px;
-  height:100vh;
-  position:fixed;
-  left:0;
-  top:0;
-  background:linear-gradient(180deg,#111827,#1f2937);
-  padding:30px 20px;
-}
+    button{
+      width:100%;
+      padding:14px;
+      margin-top:15px;
+      border:none;
+      background:#2563eb;
+      color:white;
+      font-size:18px;
+      border-radius:8px;
+      cursor:pointer;
+    }
 
-.logo{
-  color:white;
-  font-size:26px;
-  font-weight:700;
-  margin-bottom:40px;
-}
+    button:hover{
+      background:#1d4ed8;
+    }
 
-.menu a{
-  display:block;
-  padding:14px 18px;
-  margin-bottom:15px;
-  text-decoration:none;
-  color:#d1d5db;
-  border-radius:14px;
-  transition:0.3s;
-  font-weight:500;
-}
+    .job-card{
+      background:white;
+      padding:20px;
+      border-radius:10px;
+      margin-top:20px;
+      border-left:5px solid #2563eb;
+    }
 
-.menu a:hover{
-  background:#2563eb;
-  color:white;
-  transform:translateX(5px);
-}
+    .delete-btn{
+      display:inline-block;
+      margin-top:10px;
+      background:red;
+      color:white;
+      padding:10px 15px;
+      border-radius:6px;
+      text-decoration:none;
+    }
 
-.main{
-  margin-left:260px;
-  padding:40px;
-}
-
-.topbar{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  margin-bottom:35px;
-}
-
-.topbar h1{
-  font-size:32px;
-}
-
-.logout-btn{
-  background:#dc2626;
-  color:white;
-  padding:12px 22px;
-  border-radius:12px;
-  text-decoration:none;
-  font-weight:600;
-}
-
-.stats{
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
-  gap:25px;
-  margin-bottom:40px;
-}
-
-.card{
-  background:white;
-  padding:30px;
-  border-radius:22px;
-  box-shadow:0 10px 30px rgba(0,0,0,0.07);
-}
-
-.card h2{
-  font-size:38px;
-  margin-bottom:10px;
-  color:#2563eb;
-}
-
-.card p{
-  color:#6b7280;
-  font-weight:500;
-}
-
-.form-box{
-  background:white;
-  padding:35px;
-  border-radius:22px;
-  box-shadow:0 10px 30px rgba(0,0,0,0.07);
-  margin-bottom:30px;
-}
-
-.form-box h2{
-  margin-bottom:25px;
-}
-
-input,
-textarea,
-select{
-  width:100%;
-  padding:15px;
-  border:1px solid #d1d5db;
-  border-radius:14px;
-  margin-bottom:18px;
-  font-size:15px;
-  font-family:'Poppins',sans-serif;
-}
-
-textarea{
-  resize:none;
-  height:130px;
-}
-
-button{
-  background:#2563eb;
-  color:white;
-  border:none;
-  padding:15px 24px;
-  border-radius:14px;
-  font-size:15px;
-  font-weight:600;
-  cursor:pointer;
-  transition:0.3s;
-}
-
-button:hover{
-  background:#1d4ed8;
-}
-
-.quick-links{
-  margin-top:35px;
-  display:flex;
-  gap:20px;
-  flex-wrap:wrap;
-}
-
-.quick-links a{
-  background:white;
-  padding:18px 25px;
-  text-decoration:none;
-  color:#111827;
-  border-radius:18px;
-  box-shadow:0 10px 25px rgba(0,0,0,0.06);
-  font-weight:600;
-  transition:0.3s;
-}
-
-.quick-links a:hover{
-  transform:translateY(-5px);
-  background:#2563eb;
-  color:white;
-}
-
-.job-card{
-  border:1px solid #e5e7eb;
-  border-radius:16px;
-  padding:20px;
-  margin-bottom:15px;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  gap:20px;
-  flex-wrap:wrap;
-}
-
-.job-card h3{
-  margin-bottom:8px;
-}
-
-.job-card p{
-  margin-bottom:5px;
-}
-
-.delete-btn{
-  background:#dc2626;
-}
-
-.delete-btn:hover{
-  background:#b91c1c;
-}
-
-@media(max-width:900px){
-
-  .sidebar{
-    width:100%;
-    height:auto;
-    position:relative;
-  }
-
-  .main{
-    margin-left:0;
-    padding:20px;
-  }
-
-  .stats{
-    grid-template-columns:1fr;
-  }
-
-}
-
-</style>
+  </style>
 </head>
+
 <body>
 
-<div class="sidebar">
+  <div class="box">
 
-  <div class="logo">
-    Opportunity Hub
-  </div>
-
-  <div class="menu">
-
-    <a href="/">
-      🏠 Home
-    </a>
-
-    <a href="/applications.html">
-      📋 Applications
-    </a>
-
-    <a href="/admin/logout">
-      🚪 Logout
-    </a>
-
-  </div>
-
-</div>
-
-<div class="main">
-
-  <div class="topbar">
-
-    <h1>
-      Admin Dashboard
-    </h1>
-
-    <a href="/admin/logout" class="logout-btn">
-      Logout
-    </a>
-
-  </div>
-
-  <div class="stats">
-
-    <div class="card">
-      <h2 id="totalJobs">0</h2>
-      <p>Total Jobs Posted</p>
-    </div>
-
-    <div class="card">
-      <h2 id="totalApplications">0</h2>
-      <p>Total Applications</p>
-    </div>
-
-    <div class="card">
-      <h2 id="systemStatus">100%</h2>
-      <p>System Working</p>
-    </div>
-
-  </div>
-
-  <!-- POST JOB -->
-
-  <div class="form-box">
-
-    <h2>Post New Job</h2>
+    <h1>Admin Dashboard</h1>
 
     <form action="/admin/add-job" method="POST">
 
-      <select
-        name="category"
-        required
-      >
-
-        <option value="">
-          Select Job Category
-        </option>
-
-        <option value="Government">
-          Government Job
-        </option>
-
-        <option value="Corporate">
-          Corporate Job
-        </option>
-
+      <select name="category" required>
+        <option value="">Select Category</option>
+        <option value="Government">Government</option>
+        <option value="Corporate">Corporate</option>
       </select>
 
       <input
@@ -317,27 +96,40 @@ button:hover{
         name="title"
         placeholder="Job Title"
         required
-      />
+      >
 
       <input
         type="text"
         name="company"
         placeholder="Company Name"
         required
-      />
+      >
 
       <input
         type="text"
         name="location"
-        placeholder="Job Location"
+        placeholder="Location"
         required
-      />
+      >
+
+      <input
+        type="text"
+        name="salary"
+        placeholder="Salary"
+      >
 
       <textarea
         name="description"
         placeholder="Job Description"
+        rows="5"
         required
       ></textarea>
+
+      <input
+        type="text"
+        name="apply_link"
+        placeholder="Apply Link"
+      >
 
       <button type="submit">
         Post Job
@@ -345,169 +137,76 @@ button:hover{
 
     </form>
 
-  </div>
+    <hr>
 
-  <!-- MANAGE JOBS -->
+    <h2>Posted Jobs</h2>
 
-  <div class="form-box">
-
-    <h2>Manage Jobs</h2>
-
-    <div id="jobsList"></div>
+    <div id="jobs"></div>
 
   </div>
 
-  <!-- QUICK LINKS -->
+  <script>
 
-  <div class="quick-links">
+    async function loadJobs(){
 
-    <a href="/applications.html">
-      📋 View Applications
-    </a>
+      const response =
+        await fetch('/api/admin/jobs');
 
-    <a href="/">
-      🌐 Visit Website
-    </a>
+      const jobs =
+        await response.json();
 
-  </div>
+      const jobsDiv =
+        document.getElementById('jobs');
 
-</div>
+      jobsDiv.innerHTML = '';
 
-<script>
+      jobs.forEach(job => {
 
-// ================= DASHBOARD STATS =================
+        jobsDiv.innerHTML += `
 
-async function loadDashboardStats() {
+          <div class="job-card">
 
-  try {
-
-    const response = await fetch(
-      '/api/dashboard-stats',
-      {
-        method: 'GET',
-        credentials: 'same-origin'
-      }
-    );
-
-    const data = await response.json();
-
-    document.getElementById('totalJobs').innerHTML =
-      data.totalJobs;
-
-    document.getElementById('totalApplications').innerHTML =
-      data.totalApplications;
-
-    document.getElementById('systemStatus').innerHTML =
-      data.systemStatus;
-
-  } catch (error) {
-
-    console.log(error);
-
-  }
-
-}
-
-// ================= LOAD JOBS =================
-
-async function loadJobs() {
-
-  try {
-
-    const response =
-      await fetch('/api/admin/jobs');
-
-    const jobs =
-      await response.json();
-
-    const jobsList =
-      document.getElementById('jobsList');
-
-    jobsList.innerHTML = '';
-
-    jobs.forEach(job => {
-
-      jobsList.innerHTML += `
-
-        <div class="job-card">
-
-          <div>
-
-            <h3>
-              ${job.title}
-            </h3>
+            <h3>${job.title}</h3>
 
             <p>
+              <b>Company:</b>
               ${job.company}
             </p>
 
-            <small>
+            <p>
+              <b>Category:</b>
+              ${job.category}
+            </p>
+
+            <p>
+              <b>Location:</b>
               ${job.location}
-            </small>
+            </p>
+
+            <p>
+              <b>Salary:</b>
+              ${job.salary || ''}
+            </p>
+
+            <a
+              class="delete-btn"
+              href="/admin/delete-job/${job.id}"
+              onclick="return confirm('Delete this job?')"
+            >
+              Delete
+            </a>
 
           </div>
 
-          <button
-            class="delete-btn"
-            onclick="deleteJob(${job.id})"
-          >
-            Delete
-          </button>
+        `;
 
-        </div>
+      });
 
-      `;
-
-    });
-
-  } catch (error) {
-
-    console.log(error);
-
-  }
-
-}
-
-// ================= DELETE JOB =================
-
-async function deleteJob(id) {
-
-  const confirmDelete =
-    confirm('Delete this job?');
-
-  if (!confirmDelete) return;
-
-  try {
-
-    await fetch(
-      '/admin/delete-job/' + id
-    );
-
-    alert('Job Deleted Successfully');
+    }
 
     loadJobs();
 
-    loadDashboardStats();
-
-  } catch (error) {
-
-    console.log(error);
-
-  }
-
-}
-
-// ================= WINDOW LOAD =================
-
-window.onload = () => {
-
-  loadDashboardStats();
-
-  loadJobs();
-
-};
-
-</script>
+  </script>
 
 </body>
 </html>
