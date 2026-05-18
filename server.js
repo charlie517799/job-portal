@@ -429,46 +429,4 @@ app.get('/health', (req, res) => {
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
-```
 
----
-
-# ✅ Deploy Commands
-
-Run these commands in PowerShell:
-
-```powershell
-git add .
-git commit -m "Complete working server.js"
-git push
-```
-
----
-
-# ✅ Render Deploy
-
-1. Open Render dashboard.
-2. Open `job-portal` service.
-3. Click **Manual Deploy**.
-4. Click **Deploy Latest Commit**.
-
----
-
-# ✅ Test Links
-
-* Website: [https://job-portal-mdfk.onrender.com/](https://job-portal-mdfk.onrender.com/)
-* Admin Login: [https://job-portal-mdfk.onrender.com/admin-login.html](https://job-portal-mdfk.onrender.com/admin-login.html)
-* Admin Dashboard: [https://job-portal-mdfk.onrender.com/admin-dashboard.html](https://job-portal-mdfk.onrender.com/admin-dashboard.html)
-
----
-
-# ✅ Expected Result
-
-After deployment:
-
-* Admin login works.
-* Job posting works.
-* Government and Corporate categories work.
-* Applications submit successfully.
-* Dashboard stats work.
-* Missing database columns are created automatically.
