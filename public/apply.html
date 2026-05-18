@@ -1,59 +1,84 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Apply Job</title>
-<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="style.css" />
 </head>
 <body>
 
 <div class="container">
-<h2>📝 Job Application Form</h2>
+  <h2>📝 Job Application Form</h2>
 
-<form action="/apply" method="POST" enctype="multipart/form-data">
-<input type="hidden" name="job_id" id="job_id">
+  <!-- Debug message -->
+  <p id="job-id-status" style="color:red;font-weight:bold;"></p>
 
-<input type="text" name="full_name" placeholder="Full Name" required>
-<input type="text" name="mobile" placeholder="Mobile Number" required>
-<input type="number" name="age" placeholder="Age" required>
-<input type="date" name="dob" required>
+  <form action="/apply" method="POST" enctype="multipart/form-data">
+    <input type="hidden" name="job_id" id="job_id" />
 
-<select name="gender" required>
-<option value="">Select Gender</option>
-<option>Male</option>
-<option>Female</option>
-<option>Other</option>
-</select>
+    <input type="text" name="full_name" placeholder="Full Name" required />
+    <input type="text" name="mobile" placeholder="Mobile Number" required />
+    <input type="number" name="age" placeholder="Age" required />
+    <input type="date" name="dob" required />
 
-<select name="marital_status" required>
-<option value="">Marital Status</option>
-<option>Single</option>
-<option>Married</option>
-</select>
+    <select name="gender" required>
+      <option value="">Select Gender</option>
+      <option>Male</option>
+      <option>Female</option>
+      <option>Other</option>
+    </select>
 
-<textarea name="permanent_address" placeholder="Permanent Address" required></textarea>
-<textarea name="current_address" placeholder="Current Address" required></textarea>
+    <select name="marital_status" required>
+      <option value="">Marital Status</option>
+      <option>Single</option>
+      <option>Married</option>
+    </select>
 
-<label>Upload Photo</label>
-<input type="file" name="photo" required>
+    <textarea
+      name="permanent_address"
+      placeholder="Permanent Address"
+      required
+    ></textarea>
 
-<label>Upload Aadhaar Card</label>
-<input type="file" name="aadhaar" required>
+    <textarea
+      name="current_address"
+      placeholder="Current Address"
+      required
+    ></textarea>
 
-<label>Upload PAN Card</label>
-<input type="file" name="pan_card" required>
+    <label>Upload Photo</label>
+    <input type="file" name="photo" accept="image/*" required />
 
-<label>Upload Resume</label>
-<input type="file" name="resume" required>
+    <label>Upload Aadhaar Card</label>
+    <input type="file" name="aadhaar" accept="image/*,.pdf" required />
 
-<button type="submit">Submit Application</button>
-</form>
+    <label>Upload PAN Card</label>
+    <input type="file" name="pan_card" accept="image/*,.pdf" required />
+
+    <label>Upload Resume</label>
+    <input type="file" name="resume" accept=".pdf,.doc,.docx" required />
+
+    <button type="submit">Submit Application</button>
+  </form>
 </div>
 
 <script>
 const params = new URLSearchParams(window.location.search);
-document.getElementById('job_id').value = params.get('job_id') || '';
+const jobId = params.get('job_id');
+
+const jobIdInput = document.getElementById('job_id');
+const status = document.getElementById('job-id-status');
+
+if (jobId) {
+  jobIdInput.value = jobId;
+  status.style.color = 'green';
+  status.innerText = 'Job ID Found: ' + jobId;
+} else {
+  status.style.color = 'red';
+  status.innerText =
+    'Job ID not found. Please go back and click Apply Now again.';
+}
 </script>
 
 </body>
