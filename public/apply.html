@@ -11,30 +11,57 @@
 <div class="container">
   <h2>📝 Job Application Form</h2>
 
-  <!-- Debug message -->
-  <p id="job-id-status" style="color:red;font-weight:bold;"></p>
+  <!-- Job ID Status Message -->
+  <p id="job-id-status" style="font-weight:bold; margin-bottom:15px;"></p>
 
   <form action="/apply" method="POST" enctype="multipart/form-data">
+    <!-- Hidden Job ID -->
     <input type="hidden" name="job_id" id="job_id" />
 
-    <input type="text" name="full_name" placeholder="Full Name" required />
-    <input type="text" name="mobile" placeholder="Mobile Number" required />
-    <input type="number" name="age" placeholder="Age" required />
-    <input type="date" name="dob" required />
+    <!-- Personal Details -->
+    <input
+      type="text"
+      name="full_name"
+      placeholder="Full Name"
+      required
+    />
 
+    <input
+      type="text"
+      name="mobile"
+      placeholder="Mobile Number"
+      required
+    />
+
+    <input
+      type="number"
+      name="age"
+      placeholder="Age"
+      required
+    />
+
+    <input
+      type="date"
+      name="dob"
+      required
+    />
+
+    <!-- Gender -->
     <select name="gender" required>
       <option value="">Select Gender</option>
-      <option>Male</option>
-      <option>Female</option>
-      <option>Other</option>
+      <option value="Male">Male</option>
+      <option value="Female">Female</option>
+      <option value="Other">Other</option>
     </select>
 
+    <!-- Marital Status -->
     <select name="marital_status" required>
       <option value="">Marital Status</option>
-      <option>Single</option>
-      <option>Married</option>
+      <option value="Single">Single</option>
+      <option value="Married">Married</option>
     </select>
 
+    <!-- Address -->
     <textarea
       name="permanent_address"
       placeholder="Permanent Address"
@@ -47,38 +74,67 @@
       required
     ></textarea>
 
+    <!-- File Uploads -->
     <label>Upload Photo</label>
-    <input type="file" name="photo" accept="image/*" required />
+    <input
+      type="file"
+      name="photo"
+      accept="image/*"
+      required
+    />
 
     <label>Upload Aadhaar Card</label>
-    <input type="file" name="aadhaar" accept="image/*,.pdf" required />
+    <input
+      type="file"
+      name="aadhaar"
+      accept="image/*,.pdf"
+      required
+    />
 
     <label>Upload PAN Card</label>
-    <input type="file" name="pan_card" accept="image/*,.pdf" required />
+    <input
+      type="file"
+      name="pan_card"
+      accept="image/*,.pdf"
+      required
+    />
 
     <label>Upload Resume</label>
-    <input type="file" name="resume" accept=".pdf,.doc,.docx" required />
+    <input
+      type="file"
+      name="resume"
+      accept=".pdf,.doc,.doc,.docx"
+      required
+    />
 
-    <button type="submit">Submit Application</button>
+    <!-- Submit -->
+    <button type="submit">
+      Submit Application
+    </button>
   </form>
 </div>
 
 <script>
-const params = new URLSearchParams(window.location.search);
-const jobId = params.get('job_id');
+  // Read URL parameters
+  const params = new URLSearchParams(window.location.search);
 
-const jobIdInput = document.getElementById('job_id');
-const status = document.getElementById('job-id-status');
+  // Support both:
+  // /apply.html?id=14
+  // /apply.html?job_id=14
+  const jobId = params.get('job_id') || params.get('id');
 
-if (jobId) {
-  jobIdInput.value = jobId;
-  status.style.color = 'green';
-  status.innerText = 'Job ID Found: ' + jobId;
-} else {
-  status.style.color = 'red';
-  status.innerText =
-    'Job ID not found. Please go back and click Apply Now again.';
-}
+  const jobIdInput = document.getElementById('job_id');
+  const status = document.getElementById('job-id-status');
+
+  if (jobId) {
+    jobIdInput.value = jobId;
+    status.style.color = 'green';
+    status.innerText = 'Job ID Found: ' + jobId;
+  } else {
+    status.style.color = 'red';
+    status.innerText =
+      'Job ID not found. Please go back and click Apply Now again.';
+  }
 </script>
 
 </body>
