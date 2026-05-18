@@ -1,4 +1,3 @@
-
 require('dotenv').config();
 
 const express = require('express');
@@ -23,7 +22,7 @@ app.use(
     resave: false,
     saveUninitialized: false,
     cookie: {
-      maxAge: 24 * 60 * 60 * 1000,
+      maxAge: 24 * 60 * 60 * 1000, // 1 day
     },
   })
 );
@@ -52,7 +51,12 @@ const storage = new CloudinaryStorage({
   }),
 });
 
-const upload = multer({ storage });
+const upload = multer({
+  storage,
+  limits: {
+    fileSize: 10 * 1024 * 1024, // 10 MB
+  },
+});
 
 // ================= MYSQL =================
 
@@ -67,36 +71,53 @@ const db = mysql.createConnection({
   },
 });
 
-// ================= AUTO FIX DATABASE =================
+// ================= DATABASE MIGRATION =================
 
-function ensureJobsTableColumns() {
-  const queries = [
-    `ALTER TABLE jobs ADD COLUMN category VARCHAR(100) DEFAULT 'Government'`,
-    `ALTER TABLE jobs ADD COLUMN salary VARCHAR(100)`,
-    `ALTER TABLE jobs ADD COLUMN apply_link TEXT`,
-  ];
-
-  queries.forEach((sql) => {
-    db.query(sql, (err) => {
-      if (err) {
-        if (err.code === 'ER_DUP_FIELDNAME') {
-          console.log('Column already exists:', err.sqlMessage);
-        } else {
-          console.error('Migration error:', err.sqlMessage);
-        }
+function runQuery(sql) {
+  db.query(sql, (err) => {
+    if (err) {
+      if (
+        err.code === 'ER_DUP_FIELDNAME' ||
+        err.code === 'ER_TABLE_EXISTS_ERROR'
+      ) {
+        console.log('Skipped:', err.sqlMessage);
       } else {
-        console.log('Column added successfully');
+        console.error('Migration Error:', err.sqlMessage);
       }
-    });
+    } else {
+      console.log('Migration Success');
+    }
   });
 }
 
+function ensureDatabaseStructure() {
+  // jobs table extra columns
+  runQuery(
+    `ALTER TABLE jobs ADD COLUMN category VARCHAR(100) DEFAULT 'Government'`
+  );
+  runQuery(`ALTER TABLE jobs ADD COLUMN salary VARCHAR(100)`);
+  runQuery(`ALTER TABLE jobs ADD COLUMN apply_link TEXT`);
+
+  // applications table extra columns
+  runQuery(`ALTER TABLE applications ADD COLUMN age VARCHAR(20)`);
+  runQuery(`ALTER TABLE applications ADD COLUMN dob DATE`);
+  runQuery(`ALTER TABLE applications ADD COLUMN gender VARCHAR(20)`);
+  runQuery(`ALTER TABLE applications ADD COLUMN marital_status VARCHAR(50)`);
+  runQuery(`ALTER TABLE applications ADD COLUMN permanent_address TEXT`);
+  runQuery(`ALTER TABLE applications ADD COLUMN current_address TEXT`);
+  runQuery(`ALTER TABLE applications ADD COLUMN photo TEXT`);
+  runQuery(`ALTER TABLE applications ADD COLUMN aadhaar TEXT`);
+  runQuery(`ALTER TABLE applications ADD COLUMN pan_card TEXT`);
+  runQuery(`ALTER TABLE applications ADD COLUMN resume TEXT`);
+}
+
+// Connect DB
 db.connect((err) => {
   if (err) {
     console.error('Database connection failed:', err);
   } else {
     console.log('MySQL Connected Successfully');
-    ensureJobsTableColumns();
+    ensureDatabaseStructure();
   }
 });
 
@@ -125,6 +146,7 @@ app.post('/admin/login', (req, res) => {
 
   if (username === adminUsername && password === adminPassword) {
     req.session.admin = true;
+
     return req.session.save(() => {
       res.redirect('/admin-dashboard.html');
     });
@@ -133,7 +155,7 @@ app.post('/admin/login', (req, res) => {
   res.send(`
     <script>
       alert('Invalid Username or Password');
-      window.location.href='/admin-login.html';
+      window.location.href = '/admin-login.html';
     </script>
   `);
 });
@@ -195,6 +217,7 @@ app.post('/admin/add-job', isAdmin, (req, res) => {
   db.query(sql, values, (err) => {
     if (err) {
       console.error('Error adding job:', err);
+
       return res.send(`
         <script>
           alert('Error adding job: ${err.sqlMessage || 'Unknown error'}');
@@ -206,26 +229,34 @@ app.post('/admin/add-job', isAdmin, (req, res) => {
     res.send(`
       <script>
         alert('Job Posted Successfully');
-        window.location.href='/admin-dashboard.html';
+        window.location.href = '/admin-dashboard.html';
       </script>
     `);
   });
 });
 
-// ================= API JOBS =================
+// ================= GET JOBS =================
 
 app.get('/api/jobs', (req, res) => {
   db.query('SELECT * FROM jobs ORDER BY id DESC', (err, results) => {
-    if (err) return res.status(500).json([]);
+    if (err) {
+      console.error(err);
+      return res.status(500).json([]);
+    }
+
     res.json(results);
   });
 });
 
 app.get('/api/jobs/government', (req, res) => {
   db.query(
-    "SELECT * FROM jobs WHERE category='Government' ORDER BY id DESC",
+    "SELECT * FROM jobs WHERE category = 'Government' ORDER BY id DESC",
     (err, results) => {
-      if (err) return res.status(500).json([]);
+      if (err) {
+        console.error(err);
+        return res.status(500).json([]);
+      }
+
       res.json(results);
     }
   );
@@ -233,9 +264,13 @@ app.get('/api/jobs/government', (req, res) => {
 
 app.get('/api/jobs/corporate', (req, res) => {
   db.query(
-    "SELECT * FROM jobs WHERE category='Corporate' ORDER BY id DESC",
+    "SELECT * FROM jobs WHERE category = 'Corporate' ORDER BY id DESC",
     (err, results) => {
-      if (err) return res.status(500).json([]);
+      if (err) {
+        console.error(err);
+        return res.status(500).json([]);
+      }
+
       res.json(results);
     }
   );
@@ -243,7 +278,11 @@ app.get('/api/jobs/corporate', (req, res) => {
 
 app.get('/api/admin/jobs', isAdmin, (req, res) => {
   db.query('SELECT * FROM jobs ORDER BY id DESC', (err, results) => {
-    if (err) return res.status(500).json([]);
+    if (err) {
+      console.error(err);
+      return res.status(500).json([]);
+    }
+
     res.json(results);
   });
 });
@@ -268,14 +307,14 @@ app.get('/admin/delete-job/:id', isAdmin, (req, res) => {
       res.send(`
         <script>
           alert('Job Deleted Successfully');
-          window.location.href='/admin-dashboard.html';
+          window.location.href = '/admin-dashboard.html';
         </script>
       `);
     });
   });
 });
 
-// ================= APPLY JOB =================
+// ================= APPLY FOR JOB =================
 
 app.post(
   '/apply',
@@ -297,6 +336,15 @@ app.post(
       permanent_address,
       current_address,
     } = req.body;
+
+    if (!job_id || !full_name || !mobile) {
+      return res.send(`
+        <script>
+          alert('Required fields are missing.');
+          window.history.back();
+        </script>
+      `);
+    }
 
     const photo = req.files?.photo?.[0]?.path || '';
     const aadhaar = req.files?.aadhaar?.[0]?.path || '';
@@ -326,12 +374,12 @@ app.post(
       job_id,
       full_name,
       mobile,
-      age,
-      dob,
-      gender,
-      marital_status,
-      permanent_address,
-      current_address,
+      age || '',
+      dob || null,
+      gender || '',
+      marital_status || '',
+      permanent_address || '',
+      current_address || '',
       photo,
       aadhaar,
       pan_card,
@@ -340,10 +388,13 @@ app.post(
 
     db.query(sql, values, (err) => {
       if (err) {
-        console.error(err);
+        console.error('Application Error:', err);
+
         return res.send(`
           <script>
-            alert('Error submitting application');
+            alert('Error submitting application: ${
+              err.sqlMessage || 'Unknown error'
+            }');
             window.history.back();
           </script>
         `);
@@ -352,38 +403,55 @@ app.post(
       res.send(`
         <script>
           alert('Application Submitted Successfully');
-          window.location.href='/';
+          window.location.href = '/';
         </script>
       `);
     });
   }
 );
 
-// ================= APPLICATIONS =================
+// ================= GET APPLICATIONS =================
 
 app.get('/api/applications', isAdmin, (req, res) => {
   const sql = `
-    SELECT applications.*, jobs.title AS job_title
+    SELECT
+      applications.*,
+      jobs.title AS job_title
     FROM applications
-    LEFT JOIN jobs ON applications.job_id = jobs.id
+    LEFT JOIN jobs
+      ON applications.job_id = jobs.id
     ORDER BY applications.id DESC
   `;
 
   db.query(sql, (err, results) => {
-    if (err) return res.status(500).json([]);
+    if (err) {
+      console.error(err);
+      return res.status(500).json([]);
+    }
+
     res.json(results);
   });
 });
 
+// ================= DELETE APPLICATION =================
+
 app.delete('/api/applications/:id', isAdmin, (req, res) => {
+  const applicationId = req.params.id;
+
   db.query(
     'DELETE FROM applications WHERE id = ?',
-    [req.params.id],
+    [applicationId],
     (err) => {
       if (err) {
-        return res.status(500).json({ message: 'Delete failed' });
+        console.error(err);
+        return res.status(500).json({
+          message: 'Delete failed',
+        });
       }
-      res.json({ message: 'Application deleted successfully' });
+
+      res.json({
+        message: 'Application deleted successfully',
+      });
     }
   );
 });
@@ -393,16 +461,20 @@ app.delete('/api/applications/:id', isAdmin, (req, res) => {
 app.get('/api/dashboard-stats', isAdmin, (req, res) => {
   db.query('SELECT COUNT(*) AS totalJobs FROM jobs', (err, jobsResult) => {
     if (err) {
-      return res.status(500).json({ error: 'Jobs count failed' });
+      console.error(err);
+      return res.status(500).json({
+        error: 'Jobs count failed',
+      });
     }
 
     db.query(
       'SELECT COUNT(*) AS totalApplications FROM applications',
       (err2, applicationsResult) => {
         if (err2) {
-          return res
-            .status(500)
-            .json({ error: 'Applications count failed' });
+          console.error(err2);
+          return res.status(500).json({
+            error: 'Applications count failed',
+          });
         }
 
         res.json({
@@ -424,9 +496,21 @@ app.get('/health', (req, res) => {
   });
 });
 
+// ================= GLOBAL ERROR HANDLER =================
+
+app.use((err, req, res, next) => {
+  console.error('Global Error:', err);
+
+  res.status(500).send(`
+    <script>
+      alert('Server Error: ${err.message}');
+      window.history.back();
+    </script>
+  `);
+});
+
 // ================= START SERVER =================
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
-
