@@ -7,38 +7,38 @@
 
 <style>
 body{
-  margin:0;
-  font-family:Segoe UI,sans-serif;
-  background:#f4f7fb;
+margin:0;
+font-family:Segoe UI,sans-serif;
+background:#f4f7fb;
 }
 
 .container{
-  max-width:1500px;
-  margin:30px auto;
-  background:#fff;
-  padding:30px;
-  border-radius:20px;
-  box-shadow:0 10px 30px rgba(0,0,0,0.08);
+max-width:1500px;
+margin:30px auto;
+background:#fff;
+padding:30px;
+border-radius:20px;
+box-shadow:0 10px 30px rgba(0,0,0,0.08);
 }
 
 h1,h2{
-  text-align:center;
-  color:#14213d;
+text-align:center;
+color:#14213d;
 }
 
 .top-buttons{
-  display:flex;
-  gap:15px;
-  margin-bottom:25px;
+display:flex;
+gap:15px;
+margin-bottom:25px;
 }
 
 .btn{
-  padding:14px 24px;
-  border:none;
-  border-radius:12px;
-  color:white;
-  cursor:pointer;
-  font-weight:700;
+padding:14px 24px;
+border:none;
+border-radius:12px;
+color:white;
+cursor:pointer;
+font-weight:700;
 }
 
 .blue{background:#2563eb;}
@@ -46,50 +46,55 @@ h1,h2{
 .green{background:#16a34a;}
 
 input,select,textarea{
-  width:100%;
-  padding:14px;
-  margin:8px 0;
-  border:1px solid #ddd;
-  border-radius:10px;
-  font-size:16px;
+width:100%;
+padding:14px;
+margin:8px 0;
+border:1px solid #ddd;
+border-radius:10px;
+font-size:16px;
 }
 
 table{
-  width:100%;
-  border-collapse:collapse;
-  margin-top:20px;
-  font-size:14px;
+width:100%;
+border-collapse:collapse;
+margin-top:20px;
+font-size:14px;
 }
 
 th,td{
-  padding:12px;
-  border-bottom:1px solid #eee;
-  text-align:left;
+padding:12px;
+border-bottom:1px solid #eee;
+text-align:left;
 }
 
 th{
-  background:#2563eb;
-  color:white;
+background:#2563eb;
+color:white;
 }
 
 img{
-  width:70px;
-  border-radius:10px;
+width:70px;
+border-radius:10px;
 }
 
 a{
-  color:#2563eb;
-  text-decoration:none;
-  font-weight:600;
+color:#2563eb;
+text-decoration:none;
+font-weight:600;
 }
 
 .delete-btn{
-  background:#ef4444;
-  color:white;
-  padding:8px 14px;
-  border:none;
-  border-radius:8px;
-  cursor:pointer;
+background:#ef4444;
+color:white;
+padding:8px 14px;
+border:none;
+border-radius:8px;
+cursor:pointer;
+}
+
+#applicationsSection{
+display:none;
+margin-top:40px;
 }
 </style>
 </head>
@@ -100,7 +105,7 @@ a{
 <h1>🚀 Admin Dashboard</h1>
 
 <div class="top-buttons">
-<a href="#applications"><button class="btn blue">📄 All Applications</button></a>
+<button class="btn blue" onclick="toggleApplications()">📄 All Applications</button>
 <a href="/admin/logout"><button class="btn red">Logout</button></a>
 </div>
 
@@ -122,7 +127,9 @@ a{
 <button class="btn green" type="submit">Post Job</button>
 </form>
 
-<h2 id="applications">All Applications</h2>
+<div id="applicationsSection">
+
+<h2>All Applications</h2>
 
 <table>
 <thead>
@@ -147,14 +154,27 @@ a{
 
 </div>
 
-<script>
-fetch('/api/applications')
-.then(res => res.json())
-.then(data => {
-const table = document.getElementById('applicationsTable');
+</div>
 
-data.forEach(app => {
-table.innerHTML += `
+<script>
+
+function toggleApplications(){
+const section=document.getElementById('applicationsSection');
+
+if(section.style.display==="none" || section.style.display===""){
+section.style.display="block";
+}else{
+section.style.display="none";
+}
+}
+
+fetch('/api/applications')
+.then(res=>res.json())
+.then(data=>{
+const table=document.getElementById('applicationsTable');
+
+data.forEach(app=>{
+table.innerHTML+=`
 <tr>
 <td>${app.full_name || ''}</td>
 <td>${app.mobile || ''}</td>
@@ -162,24 +182,16 @@ table.innerHTML += `
 <td>${app.gender || ''}</td>
 <td>${app.marital_status || ''}</td>
 
-<td>
-${app.photo ? `<img src="${app.photo}">` : 'No Photo'}
-</td>
+<td>${app.photo ? `<img src="${app.photo}">` : 'No Photo'}</td>
 
-<td>
-${app.aadhaar ? `<a href="${app.aadhaar}" target="_blank">View Aadhaar</a>` : 'No File'}
-</td>
+<td>${app.aadhaar ? `<a href="${app.aadhaar}" target="_blank">View Aadhaar</a>` : 'No File'}</td>
 
-<td>
-${app.pan_card ? `<a href="${app.pan_card}" target="_blank">View PAN</a>` : 'No File'}
-</td>
+<td>${app.pan_card ? `<a href="${app.pan_card}" target="_blank">View PAN</a>` : 'No File'}</td>
 
 <td>${app.permanent_address || ''}</td>
 <td>${app.current_address || ''}</td>
 
-<td>
-${app.resume ? `<a href="${app.resume}" target="_blank">View Resume</a>` : 'No Resume'}
-</td>
+<td>${app.resume ? `<a href="${app.resume}" target="_blank">View Resume</a>` : 'No Resume'}</td>
 
 <td>
 <button class="delete-btn" onclick="deleteApplication(${app.id})">Delete</button>
@@ -191,7 +203,7 @@ ${app.resume ? `<a href="${app.resume}" target="_blank">View Resume</a>` : 'No R
 
 function deleteApplication(id){
 if(confirm('Delete this application?')){
-fetch('/api/applications/' + id,{
+fetch('/api/applications/'+id,{
 method:'DELETE'
 })
 .then(()=>location.reload());
