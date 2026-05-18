@@ -3,18 +3,47 @@
 <head>
 <title>All Applications</title>
 <style>
-body{font-family:Segoe UI;background:#f4f7fb;padding:30px}
-.container{max-width:1600px;margin:auto;background:white;padding:30px;border-radius:20px}
-table{width:100%;border-collapse:collapse}
-th,td{padding:12px;border-bottom:1px solid #eee}
-th{background:#2563eb;color:white}
-img{width:70px}
+body{
+font-family:Segoe UI;
+background:#f4f7fb;
+padding:30px;
+}
+.container{
+max-width:1800px;
+margin:auto;
+background:white;
+padding:30px;
+border-radius:20px;
+}
+table{
+width:100%;
+border-collapse:collapse;
+font-size:14px;
+}
+th,td{
+padding:12px;
+border-bottom:1px solid #eee;
+}
+th{
+background:#2563eb;
+color:white;
+}
+img{
+width:70px;
+border-radius:8px;
+}
+a{
+color:#2563eb;
+font-weight:bold;
+}
 </style>
 </head>
 <body>
 
 <div class="container">
+
 <a href="/admin-dashboard.html">← Back</a>
+
 <h1>All Applications</h1>
 
 <table>
@@ -22,14 +51,22 @@ img{width:70px}
 <tr>
 <th>Name</th>
 <th>Mobile</th>
+<th>Age</th>
+<th>DOB</th>
+<th>Gender</th>
+<th>Marital</th>
+<th>Permanent Address</th>
+<th>Current Address</th>
 <th>Photo</th>
 <th>Aadhaar</th>
 <th>PAN</th>
 <th>Resume</th>
 </tr>
 </thead>
+
 <tbody id="applicationsTable"></tbody>
 </table>
+
 </div>
 
 <script>
@@ -41,13 +78,20 @@ const table=document.getElementById('applicationsTable');
 data.forEach(app=>{
 table.innerHTML+=`
 <tr>
-<td>${app.full_name}</td>
-<td>${app.mobile}</td>
-<td><img src="${app.photo}"></td>
-<td><a href="${app.aadhaar}" target="_blank">View</a></td>
-<td><a href="${app.pan_card}" target="_blank">View</a></td>
-<td><a href="${app.resume}" target="_blank">View</a></td>
-</tr>`;
+<td>${app.full_name || ''}</td>
+<td>${app.mobile || ''}</td>
+<td>${app.age || ''}</td>
+<td>${app.dob || ''}</td>
+<td>${app.gender || ''}</td>
+<td>${app.marital_status || ''}</td>
+<td>${app.permanent_address || ''}</td>
+<td>${app.current_address || ''}</td>
+<td>${app.photo ? `<img src="${app.photo}">` : 'No Photo'}</td>
+<td>${app.aadhaar ? `<a href="${app.aadhaar}" target="_blank">View</a>` : 'No File'}</td>
+<td>${app.pan_card ? `<a href="${app.pan_card}" target="_blank">View</a>` : 'No File'}</td>
+<td>${app.resume ? `<a href="${app.resume}" target="_blank">View</a>` : 'No Resume'}</td>
+</tr>
+`;
 });
 });
 </script>
