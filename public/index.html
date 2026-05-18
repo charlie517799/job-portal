@@ -1,137 +1,491 @@
-<!-- index.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4484833601433628"
-     crossorigin="anonymous"></script>
+<meta charset="UTF-8" />
 
+<meta
+  name="viewport"
+  content="width=device-width, initial-scale=1.0"
+/>
 
+<script
+  async
+  src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4484833601433628"
+  crossorigin="anonymous">
+</script>
 
+<title>WorkFinder</title>
 
+<style>
 
-  <title>WorkFinder</title>
+body{
 
-  <style>
-    body {
-      margin: 0;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background:
-        linear-gradient(135deg, rgba(37, 99, 235, 0.85), rgba(15, 23, 42, 0.95)),
-        url('https://images.unsplash.com/photo-1521791136064-7986c2920216?auto=format&fit=crop&w=1600&q=80')
-        center/cover no-repeat fixed;
-      min-height: 100vh;
-    }
+  margin:0;
 
-    .hero {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      padding: 80px 20px 50px;
-    }
+  font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;
 
-    .glass-card {
-      width: 100%;
-      max-width: 900px;
-      text-align: center;
-      padding: 60px 40px;
-      border-radius: 28px;
-      background: rgba(255, 255, 255, 0.12);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
-      color: white;
-    }
+  background:
 
-    .glass-card h1 {
-      margin: 0;
-      font-size: 64px;
-      font-weight: 800;
-    }
+    linear-gradient(
+      135deg,
+      rgba(37,99,235,0.85),
+      rgba(15,23,42,0.95)
+    ),
 
-    .glass-card p {
-      margin-top: 18px;
-      font-size: 22px;
-      color: rgba(255, 255, 255, 0.9);
-    }
+    url(
+      'https://images.unsplash.com/photo-1521791136064-7986c2920216?auto=format&fit=crop&w=1600&q=80'
+    )
 
-    .hero-buttons {
-      margin-top: 35px;
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 15px;
-    }
+    center/cover no-repeat fixed;
 
-    .hero-buttons a {
-      display: inline-block;
-      padding: 14px 28px;
-      border-radius: 999px;
-      background: white;
-      color: #1d4ed8;
-      font-weight: 700;
-      text-decoration: none;
-      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
-      transition: 0.3s;
-      cursor: pointer;
-    }
+  min-height:100vh;
 
-    .hero-buttons a:hover {
-      transform: translateY(-4px);
-      background: #eff6ff;
-    }
+}
 
-    #jobs-container {
-      max-width: 1100px;
-      margin: 20px auto 60px;
-      padding: 0 20px;
-    }
+.hero{
 
-    @media (max-width: 768px) {
-      .glass-card h1 {
-        font-size: 42px;
-      }
+  display:flex;
 
-      .hero-buttons a {
-        width: 100%;
-        max-width: 280px;
-      }
-    }
-  </style>
+  justify-content:center;
+
+  align-items:center;
+
+  padding:80px 20px 50px;
+
+}
+
+.glass-card{
+
+  width:100%;
+
+  max-width:900px;
+
+  text-align:center;
+
+  padding:60px 40px;
+
+  border-radius:28px;
+
+  background:rgba(255,255,255,0.12);
+
+  backdrop-filter:blur(12px);
+
+  -webkit-backdrop-filter:blur(12px);
+
+  border:1px solid rgba(255,255,255,0.2);
+
+  box-shadow:0 20px 60px rgba(0,0,0,0.35);
+
+  color:white;
+
+}
+
+.glass-card h1{
+
+  margin:0;
+
+  font-size:64px;
+
+  font-weight:800;
+
+}
+
+.glass-card p{
+
+  margin-top:18px;
+
+  font-size:22px;
+
+  color:rgba(255,255,255,0.9);
+
+}
+
+.hero-buttons{
+
+  margin-top:35px;
+
+  display:flex;
+
+  flex-wrap:wrap;
+
+  justify-content:center;
+
+  gap:15px;
+
+}
+
+.hero-buttons a{
+
+  display:inline-block;
+
+  padding:14px 28px;
+
+  border-radius:999px;
+
+  background:white;
+
+  color:#1d4ed8;
+
+  font-weight:700;
+
+  text-decoration:none;
+
+  box-shadow:0 8px 20px rgba(0,0,0,0.2);
+
+  transition:0.3s;
+
+  cursor:pointer;
+
+}
+
+.hero-buttons a:hover{
+
+  transform:translateY(-4px);
+
+  background:#eff6ff;
+
+}
+
+#jobs-container{
+
+  max-width:1100px;
+
+  margin:20px auto 60px;
+
+  padding:0 20px;
+
+}
+
+.job-card{
+
+  background:white;
+
+  padding:30px;
+
+  border-radius:24px;
+
+  margin-bottom:25px;
+
+  box-shadow:0 12px 35px rgba(0,0,0,0.15);
+
+}
+
+.job-card h2{
+
+  margin-top:0;
+
+  font-size:36px;
+
+  margin-bottom:20px;
+
+}
+
+.job-card p{
+
+  font-size:20px;
+
+  line-height:1.7;
+
+}
+
+.apply-btn{
+
+  display:inline-block;
+
+  margin-top:20px;
+
+  background:#2563eb;
+
+  color:white;
+
+  text-decoration:none;
+
+  padding:14px 28px;
+
+  border-radius:14px;
+
+  font-weight:700;
+
+  transition:0.3s;
+
+}
+
+.apply-btn:hover{
+
+  background:#1d4ed8;
+
+}
+
+.footer-links{
+
+  text-align:center;
+
+  padding-bottom:40px;
+
+}
+
+.footer-links a{
+
+  color:white;
+
+  margin:0 10px;
+
+  text-decoration:none;
+
+  font-weight:600;
+
+}
+
+.footer-links a:hover{
+
+  text-decoration:underline;
+
+}
+
+.no-jobs{
+
+  text-align:center;
+
+  color:white;
+
+  font-size:28px;
+
+  font-weight:700;
+
+  margin-top:50px;
+
+}
+
+@media(max-width:768px){
+
+  .glass-card h1{
+
+    font-size:42px;
+
+  }
+
+  .hero-buttons a{
+
+    width:100%;
+
+    max-width:280px;
+
+  }
+
+  .job-card h2{
+
+    font-size:28px;
+
+  }
+
+}
+
+</style>
+
 </head>
+
 <body>
 
-  <div class="hero">
-    <div class="glass-card">
-      <h1>🚀 WorkFinder</h1>
-      <p>Your Gateway to Government & Corporate Jobs</p>
+<div class="hero">
 
-      <div class="hero-buttons">
-        <!-- return false lagane se link jump nahi karega -->
-        <a href="#" onclick="showJobs('Government'); return false;">
-          Government Jobs
-        </a>
+  <div class="glass-card">
 
-        <a href="#" onclick="showJobs('Corporate'); return false;">
-          Corporate Jobs
-        </a>
+    <h1>
+      🚀 WorkFinder
+    </h1>
 
-        <a href="/admin-login.html">
-          Panel
-        </a>
-      </div>
+    <p>
+      Your Gateway to Government & Corporate Jobs
+    </p>
+
+    <div class="hero-buttons">
+
+      <a
+        href="#"
+        onclick="showJobs('Government'); return false;"
+      >
+        Government Jobs
+      </a>
+
+      <a
+        href="#"
+        onclick="showJobs('Corporate'); return false;"
+      >
+        Corporate Jobs
+      </a>
+
+      <a
+        href="#"
+        onclick="showJobs('All'); return false;"
+      >
+        All Jobs
+      </a>
+
+      <a href="/admin-login.html">
+        Panel
+      </a>
+
     </div>
+
   </div>
 
-  <!-- Jobs list yahan show hogi -->
-  <div id="jobs-container"></div>
-<a href="/about.html">About Us</a>
-<a href="/contact.html">Contact Us</a>
-<a href="/privacy.html">Privacy Policy</a>
-<a href="/terms.html">Terms & Conditions</a>
-  <script src="script.js"></script>
+</div>
+
+<!-- JOBS -->
+
+<div id="jobs-container"></div>
+
+<!-- FOOTER -->
+
+<div class="footer-links">
+
+  <a href="/about.html">
+    About Us
+  </a>
+
+  <a href="/contact.html">
+    Contact Us
+  </a>
+
+  <a href="/privacy.html">
+    Privacy Policy
+  </a>
+
+  <a href="/terms.html">
+    Terms & Conditions
+  </a>
+
+</div>
+
+<script>
+
+// ================= LOAD JOBS =================
+
+async function showJobs(category = 'All') {
+
+  try {
+
+    let apiUrl = '/api/jobs';
+
+    if (category === 'Government') {
+
+      apiUrl = '/api/jobs/government';
+
+    }
+
+    if (category === 'Corporate') {
+
+      apiUrl = '/api/jobs/corporate';
+
+    }
+
+    const response =
+      await fetch(apiUrl);
+
+    const jobs =
+      await response.json();
+
+    const jobsContainer =
+      document.getElementById(
+        'jobs-container'
+      );
+
+    jobsContainer.innerHTML = '';
+
+    if (jobs.length === 0) {
+
+      jobsContainer.innerHTML = `
+
+        <div class="no-jobs">
+
+          No Jobs Available
+
+        </div>
+
+      `;
+
+      return;
+
+    }
+
+    jobs.forEach(job => {
+
+      jobsContainer.innerHTML += `
+
+        <div class="job-card">
+
+          <h2>
+            ${job.title}
+          </h2>
+
+          <p>
+
+            <strong>
+              Company:
+            </strong>
+
+            ${job.company}
+
+          </p>
+
+          <p>
+
+            <strong>
+              Category:
+            </strong>
+
+            ${job.category}
+
+          </p>
+
+          <p>
+
+            <strong>
+              Location:
+            </strong>
+
+            ${job.location}
+
+          </p>
+
+          <p>
+            ${job.description}
+          </p>
+
+          <a
+            class="apply-btn"
+            href="/apply.html?id=${job.id}"
+          >
+            Apply Now
+          </a>
+
+        </div>
+
+      `;
+
+    });
+
+  } catch (error) {
+
+    console.log(
+      'Error loading jobs:',
+      error
+    );
+
+  }
+
+}
+
+// ================= DEFAULT LOAD =================
+
+window.onload = () => {
+
+  showJobs('All');
+
+};
+
+</script>
+
 </body>
 </html>
