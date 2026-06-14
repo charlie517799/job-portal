@@ -324,39 +324,48 @@ app.post(
     { name: 'pan_card', maxCount: 1 },
     { name: 'resume', maxCount: 1 },
   ]),
-  (req, res) => {
-    const {
-      job_id,
-      full_name,
-      mobile,
-      age,
-      dob,
-      gender,
-      marital_status,
-      permanent_address,
-      current_address,
-    } = req.body;
+  async (req, res) => {
+    try {
 
-    if (!job_id || !full_name || !mobile) {
-      return res.send(`
-        <script>
-          alert('Required fields are missing.');
-          window.history.back();
-        </script>
-      `);
-    }
+      console.log('FORM RECEIVED');
 
-    const photo = req.files?.photo?.[0]?.path || '';
-    const aadhaar = req.files?.aadhaar?.[0]?.path || '';
-    const pan_card = req.files?.pan_card?.[0]?.path || '';
-    const resume = req.files?.resume?.[0]?.path || '';
-
-    const sql = `
-      INSERT INTO applications (
+      const {
         job_id,
         full_name,
         mobile,
-        age,
+        dob,
+        gender,
+        marital_status,
+        permanent_address,
+        current_address,
+        email,
+        qualification,
+        experience,
+        skills
+      } = req.body;
+
+      if (!job_id || !full_name || !mobile) {
+        return res.send(`
+          <script>
+            alert('Required fields missing');
+            window.history.back();
+          </script>
+        `);
+      }
+
+      const photo = req.files?.photo?.[0]?.path || '';
+      const aadhaar = req.files?.aadhaar?.[0]?.path || '';
+      const pan_card = req.files?.pan_card?.[0]?.path || '';
+      const resume = req.files?.resume?.[0]?.path || '';
+
+      console.log('FILES UPLOADED');
+
+      const sql = `
+      INSERT INTO applications
+      (
+        job_id,
+        full_name,
+        mobile,
         dob,
         gender,
         marital_status,
@@ -367,46 +376,59 @@ app.post(
         pan_card,
         resume
       )
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    `;
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      `;
 
-    const values = [
-      job_id,
-      full_name,
-      mobile,
-      age || '',
-      dob || null,
-      gender || '',
-      marital_status || '',
-      permanent_address || '',
-      current_address || '',
-      photo,
-      aadhaar,
-      pan_card,
-      resume,
-    ];
+      const values = [
+        job_id,
+        full_name,
+        mobile,
+        dob || null,
+        gender || '',
+        marital_status || '',
+        permanent_address || '',
+        current_address || '',
+        photo,
+        aadhaar,
+        pan_card,
+        resume
+      ];
 
-    db.query(sql, values, (err) => {
-      if (err) {
-        console.error('Application Error:', err);
+      db.query(sql, values, (err) => {
 
-        return res.send(`
+        if (err) {
+          console.error('Application Error:', err);
+
+          return res.send(`
+            <script>
+              alert('Database Error');
+              window.history.back();
+            </script>
+          `);
+        }
+
+        console.log('APPLICATION SAVED');
+
+        res.send(`
           <script>
-            alert('Error submitting application: ${
-              err.sqlMessage || 'Unknown error'
-            }');
-            window.history.back();
+            alert('Application Submitted Successfully');
+            window.location.href='/';
           </script>
         `);
-      }
+
+      });
+
+    } catch (error) {
+
+      console.error(error);
 
       res.send(`
         <script>
-          alert('Application Submitted Successfully');
-          window.location.href = '/';
+          alert('Server Error');
+          window.history.back();
         </script>
       `);
-    });
+    }
   }
 );
 
