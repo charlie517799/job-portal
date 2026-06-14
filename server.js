@@ -416,7 +416,9 @@ app.get('/api/applications', isAdmin, (req, res) => {
   const sql = `
     SELECT
       applications.*,
-      jobs.title AS job_title
+      jobs.title AS job_title,
+      jobs.category AS category,
+      jobs.company AS company
     FROM applications
     LEFT JOIN jobs
       ON applications.job_id = jobs.id

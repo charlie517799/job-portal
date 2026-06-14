@@ -81,6 +81,8 @@ background:#dc2626;
 <table>
 <thead>
 <tr>
+<th>Job Title</th>
+<th>Category</th>
 <th>Name</th>
 <th>Mobile</th>
 <th>Age</th>
@@ -140,6 +142,16 @@ data.forEach(app=>{
 
 table.innerHTML+=`
 <tr>
+<tr>
+
+<td><strong>${app.job_title || 'N/A'}</strong></td>
+
+<td>
+<span style="padding:4px 8px;border-radius:6px;background:#e0f2fe;">
+${app.category || 'N/A'}
+</span>
+</td>
+
 <td>${app.full_name || ''}</td>
 <td>${app.mobile || ''}</td>
 <td>${app.age || ''}</td>
@@ -148,7 +160,6 @@ table.innerHTML+=`
 <td>${app.marital_status || ''}</td>
 <td>${app.permanent_address || ''}</td>
 <td>${app.current_address || ''}</td>
-
 <td>
 ${app.photo
 ? `<img src="${app.photo}">`
