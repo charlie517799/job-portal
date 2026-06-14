@@ -95,6 +95,7 @@ background:#dc2626;
 <th>Aadhaar</th>
 <th>PAN</th>
 <th>Resume</th>
+<th>Applied Date</th>
 <th>Action</th>
 </tr>
 </thead>
@@ -140,8 +141,19 @@ const table=document.getElementById('applicationsTable');
 
 data.forEach(app=>{
 
+const appliedDate = app.created_at
+? new Date(app.created_at).toLocaleString("en-IN",{
+    timeZone:"Asia/Kolkata",
+    day:"2-digit",
+    month:"short",
+    year:"numeric",
+    hour:"numeric",
+    minute:"2-digit",
+    hour12:true
+})
+: "N/A";
+
 table.innerHTML+=`
-<tr>
 <tr>
 
 <td><strong>${app.job_title || 'N/A'}</strong></td>
@@ -183,6 +195,8 @@ ${app.resume
 ? `<a href="${app.resume}" target="_blank">View</a>`
 : 'No Resume'}
 </td>
+
+<td>${appliedDate}</td>
 
 <td>
 <button
