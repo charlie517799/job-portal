@@ -11,6 +11,10 @@ const session = require('express-session');
 const app = express();
 const PORT = process.env.PORT || 3001;
 
+
+const fetch = (...args) =>
+  import('node-fetch').then(({ default: fetch }) => fetch(...args));
+
 // ================= MIDDLEWARE =================
 
 app.use(express.urlencoded({ extended: true }));
@@ -409,12 +413,38 @@ app.post(
 
         console.log('APPLICATION SAVED');
 
-        res.send(`
-          <script>
-            alert('Application Submitted Successfully');
-            window.location.href='/';
-          </script>
-        `);
+fetch(
+  'https://script.google.com/macros/s/AKfycbzWUA5wmk-b-Cl0nh8OLmP4khwYh0g67V4pszsXI8okULkZusagu0J5A_OOupwdt_7CZQ/exec',
+  {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      job_title: job_id,
+      name: full_name,
+      mobile: mobile,
+      dob: dob,
+      gender: gender,
+      marital_status: marital_status,
+      permanent_address: permanent_address,
+      current_address: current_address,
+      photo: photo,
+      aadhaar: aadhaar,
+      pan_card: pan_card,
+      resume: resume
+    })
+  }
+)
+.then(() => console.log('Google Sheet Updated'))
+.catch(err => console.error('Google Sheet Error:', err));
+
+res.send(`
+  <script>
+    alert('Application Submitted Successfully');
+    window.location.href='/';
+  </script>
+`);
 
       });
 
