@@ -413,31 +413,49 @@ app.post(
 
         console.log('APPLICATION SAVED');
 
-fetch(
-  'https://script.google.com/macros/s/AKfycbzWUA5wmk-b-Cl0nh8OLmP4khwYh0g67V4pszsXI8okULkZusagu0J5A_OOupwdt_7CZQ/exec',
-  {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({
-      job_title: job_id,
-      name: full_name,
-      mobile: mobile,
-      dob: dob,
-      gender: gender,
-      marital_status: marital_status,
-      permanent_address: permanent_address,
-      current_address: current_address,
-      photo: photo,
-      aadhaar: aadhaar,
-      pan_card: pan_card,
-      resume: resume
-    })
+db.query(
+  'SELECT title, category FROM jobs WHERE id = ?',
+  [job_id],
+  (jobErr, jobResult) => {
+
+    const jobTitle =
+      jobResult && jobResult.length
+        ? jobResult[0].title
+        : '';
+
+    const category =
+      jobResult && jobResult.length
+        ? jobResult[0].category
+        : '';
+
+    fetch(
+      'https://script.google.com/macros/s/AKfycbzWUA5wmk-b-Cl0nh8OLmP4khwYh0g67V4pszsXI8okULkZusagu0J5A_OOupwdt_7CZQ/exec',
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          job_title: jobTitle,
+          category: category,
+          name: full_name,
+          mobile: mobile,
+          dob: dob,
+          gender: gender,
+          marital_status: marital_status,
+          permanent_address: permanent_address,
+          current_address: current_address,
+          photo: photo,
+          aadhaar: aadhaar,
+          pan_card: pan_card,
+          resume: resume
+        })
+      }
+    )
+    .then(() => console.log('Google Sheet Updated'))
+    .catch(err => console.error('Google Sheet Error:', err));
   }
-)
-.then(() => console.log('Google Sheet Updated'))
-.catch(err => console.error('Google Sheet Error:', err));
+);
 
 res.send(`
   <script>
@@ -446,7 +464,7 @@ res.send(`
   </script>
 `);
 
-      });
+      }); // db.query(sql, values)
 
     } catch (error) {
 
@@ -460,7 +478,7 @@ res.send(`
       `);
     }
   }
-);
+); // <-- APPLY ROUTE END HERE
 
 // ================= GET APPLICATIONS =================
 
