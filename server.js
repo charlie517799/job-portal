@@ -182,7 +182,68 @@ app.post('/login', (req, res) => {
   );
 
 });
+// ================= ADMIN LOGIN =================
 
+app.post('/admin/login', (req, res) => {
+
+  const { username, password } = req.body;
+
+  if (
+    username.toLowerCase() === 'anmolupade414@gmail.com' &&
+    password === '251122'
+  ) {
+
+    req.session.admin = true;
+
+    return req.session.save(() => {
+      res.redirect('/admin-dashboard.html');
+    });
+
+  }
+
+  res.send(`
+    <script>
+      alert('Invalid Username or Password');
+      window.location.href='/admin-login.html';
+    </script>
+  `);
+
+});
+
+
+// ================= USER REGISTER =================
+
+app.post('/register', (req, res) => {
+
+  const { name, mobile, email, password } = req.body;
+
+  db.query(
+    'INSERT INTO users(name,mobile,email,password) VALUES (?,?,?,?)',
+    [name, mobile, email, password],
+    (err) => {
+
+      if (err) {
+        console.error(err);
+
+        return res.send(`
+          <script>
+            alert('Email already exists');
+            window.location.href='/register.html';
+          </script>
+        `);
+      }
+
+      res.send(`
+        <script>
+          alert('Registration Successful');
+          window.location.href='/login.html';
+        </script>
+      `);
+
+    }
+  );
+
+});
 // ================= ADMIN LOGOUT =================
 
 app.get('/admin/logout', (req, res) => {
