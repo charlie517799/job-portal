@@ -11,8 +11,8 @@ const session = require('express-session');
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-app.set('trust proxy', 1);
 
+app.set('trust proxy', 1);
 
 const fetch = (...args) =>
   import('node-fetch').then(({ default: fetch }) => fetch(...args));
@@ -140,13 +140,11 @@ function isAdmin(req, res, next) {
 // ================= HOME =================
 
 app.get('/', (req, res) => {
-
-  if (!req.session.user && !req.session.admin) {
-    return res.redirect('/login.html');
-  }
-
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
+
+
+
 // ================= ADMIN LOGIN =================
 
 // ================= USER + ADMIN LOGIN =================
