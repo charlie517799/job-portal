@@ -11,6 +11,8 @@ const session = require('express-session');
 const app = express();
 const PORT = process.env.PORT || 3001;
 
+app.set('trust proxy', 1);
+
 
 const fetch = (...args) =>
   import('node-fetch').then(({ default: fetch }) => fetch(...args));
@@ -22,12 +24,13 @@ app.use(express.json());
 
 app.use(
   session({
-    secret: process.env.SESSION_SECRET || 'jobportal_secret_key',
+    secret: 'jobportal_secret_key',
     resave: false,
     saveUninitialized: false,
     cookie: {
-      maxAge: 24 * 60 * 60 * 1000, // 1 day
-    },
+      secure: false,
+      maxAge: 24 * 60 * 60 * 1000
+    }
   })
 );
 
