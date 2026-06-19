@@ -137,31 +137,50 @@ function isAdmin(req, res, next) {
 // ================= HOME =================
 
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'index.html'));
-});
 
-// ================= ADMIN LOGIN =================
-
-app.post('/admin/login', (req, res) => {
-  const { username, password } = req.body;
-
-  const adminUsername = 'anmolupade414@gmail.com';
-const adminPassword = '251122';
-
-  if (username === adminUsername && password === adminPassword) {
-    req.session.admin = true;
-
-    return req.session.save(() => {
-      res.redirect('/admin-dashboard.html');
-    });
+  if (!req.session.user && !req.session.admin) {
+    return res.redirect('/login.html');
   }
 
-  res.send(`
-    <script>
-      alert('Invalid Username or Password');
-      window.location.href = '/admin-login.html';
-    </script>
-  `);
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+// ================= ADMIN LOGIN =================
+
+// ================= USER + ADMIN LOGIN =================
+
+app.post('/login', (req, res) => {
+
+  const { email, password } = req.body;
+
+  // ADMIN LOGIN
+  if (
+    email.toLowerCase() === 'anmolupade414@gmail.com' &&
+    password === '251122'
+  ) {
+    req.session.admin = true;
+    return res.redirect('/admin-dashboard.html');
+  }
+
+  // USER LOGIN
+  db.query(
+    'SELECT * FROM users WHERE email=? AND password=?',
+    [email, password],
+    (err, result) => {
+
+      if (err) {
+        console.error(err);
+        return res.send('Database Error');
+      }
+
+      if (result.length > 0) {
+        req.session.user = result[0].id;
+        return res.redirect('/');
+      }
+
+      res.send('Invalid Email or Password');
+    }
+  );
+
 });
 
 // ================= ADMIN LOGOUT =================
