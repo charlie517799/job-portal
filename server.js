@@ -131,7 +131,7 @@ function isAdmin(req, res, next) {
   if (req.session.admin) {
     return next();
   }
-  return res.redirect('/admin-login.html');
+  return res.redirect('/login.html');
 }
 
 // ================= HOME =================
@@ -244,13 +244,22 @@ app.post('/register', (req, res) => {
   );
 
 });
-// ================= ADMIN LOGOUT =================
 
-app.get('/admin/logout', (req, res) => {
+
+app.get('/logout', (req, res) => {
   req.session.destroy(() => {
-    res.redirect('/admin-login.html');
+    res.redirect('/login.html');
   });
 });
+
+
+
+
+
+
+
+// ================= ADMIN LOGOUT =================
+
 
 // ================= ADD JOB =================
 
